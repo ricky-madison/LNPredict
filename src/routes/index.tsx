@@ -12,6 +12,8 @@ import {
 } from "@/lib/lnp/data";
 import { DEFAULT_INPUT, buildReport, runDesign, type DesignInput } from "@/lib/lnp/predict";
 import { printReport } from "@/lib/lnp/report-html";
+import { ParticleViewer3D } from "@/components/lnp/ParticleViewer3D";
+
 
 
 export const Route = createFileRoute("/")({
