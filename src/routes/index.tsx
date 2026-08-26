@@ -12,6 +12,8 @@ import {
 } from "@/lib/lnp/data";
 import { DEFAULT_INPUT, buildReport, runDesign, type DesignInput } from "@/lib/lnp/predict";
 import { printReport } from "@/lib/lnp/report-html";
+import { ParticleViewer3D } from "@/components/lnp/ParticleViewer3D";
+
 
 
 export const Route = createFileRoute("/")({
@@ -547,6 +549,29 @@ function Designer() {
                     ))}
                   </ol>
                 </div>
+
+                <div className="rounded-xl bg-panel ring-1 ring-black/5 p-4">
+                  <div className="flex items-baseline justify-between mb-3">
+                    <h2 className="text-[13px] font-semibold tracking-tight">3D particle cross-section</h2>
+                    <Link
+                      to="/structure"
+                      className="font-mono text-[10px] text-accent-ink hover:underline"
+                    >
+                      molecular viewer →
+                    </Link>
+                  </div>
+                  <ParticleViewer3D
+                    sizeNm={lead.size}
+                    pdi={lead.pdi}
+                    ionizablePct={input.ionizablePct}
+                    helperPct={input.helperPct}
+                    cholPct={input.cholPct}
+                    pegPct={input.pegPct}
+                    encapsulation={lead.encapsulation}
+                    cargoLabel={input.cargo}
+                  />
+                </div>
+
 
                 <div className="rounded-xl bg-panel ring-1 ring-black/5 p-4 flex-1">
                   <div className="flex items-baseline justify-between mb-3">
