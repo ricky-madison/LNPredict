@@ -1,4 +1,4 @@
-import { createFileRoute } from "@tanstack/react-router";
+import { createFileRoute, Link } from "@tanstack/react-router";
 import { useMemo, useState } from "react";
 
 import {
@@ -11,6 +11,8 @@ import {
   type CargoType,
 } from "@/lib/lnp/data";
 import { DEFAULT_INPUT, buildReport, runDesign, type DesignInput } from "@/lib/lnp/predict";
+import { printReport } from "@/lib/lnp/report-html";
+
 
 export const Route = createFileRoute("/")({
   head: () => ({
