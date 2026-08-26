@@ -1,4 +1,4 @@
-import { createFileRoute } from "@tanstack/react-router";
+import { createFileRoute, Link } from "@tanstack/react-router";
 import { useMemo, useState } from "react";
 
 import {
@@ -11,6 +11,8 @@ import {
   type CargoType,
 } from "@/lib/lnp/data";
 import { DEFAULT_INPUT, buildReport, runDesign, type DesignInput } from "@/lib/lnp/predict";
+import { printReport } from "@/lib/lnp/report-html";
+
 
 export const Route = createFileRoute("/")({
   head: () => ({
@@ -179,10 +181,24 @@ function Designer() {
             onClick={exportReport}
             className="font-mono text-[11px] font-medium text-accent-ink ring-1 ring-primary/40 rounded-lg py-2 px-3 hover:bg-primary/5 transition-colors"
           >
-            ↓ Export report
+            ↓ JSON
           </button>
+          <button
+            type="button"
+            onClick={() => printReport(result)}
+            className="font-mono text-[11px] font-medium text-accent-ink ring-1 ring-primary/40 rounded-lg py-2 px-3 hover:bg-primary/5 transition-colors"
+          >
+            ↓ PDF spec
+          </button>
+          <Link
+            to="/validation"
+            className="font-mono text-[11px] font-medium text-ink-soft ring-1 ring-line rounded-lg py-2 px-3 hover:bg-primary/5 transition-colors"
+          >
+            Validation →
+          </Link>
         </div>
       </header>
+
 
       <main className="px-5 py-5">
         <h1 className="sr-only">p53-LNP Designer — in silico lipid nanoparticle formulation platform</h1>
