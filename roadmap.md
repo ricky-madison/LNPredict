@@ -5,4 +5,4 @@
 - [x] Fig 3 release curves (pH, redox, enzyme, thermo, ultrasound)
 - [x] SORT trade-offs, anti-PEG risk, anti-PD-1 context, Table 3 benchmarks
 - [x] /paper companion route with Tables 1-3 and Figs 1-4
-- [ ] Verify in browser, update memory/AGENTS.md
+- [x] Verified in browser, tests added, AGENTS.md updated
