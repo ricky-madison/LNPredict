@@ -89,6 +89,8 @@ export function LipidViewer3D({ smiles, name }: { smiles: string; name: string }
 
       const box = new THREE.Box3().setFromObject(root);
       const radius = box.getSize(new THREE.Vector3()).length() / 2 || 5;
+      let zoomed = false;
+      const bsphere = box.getBoundingSphere(new THREE.Sphere()).radius || radius;
       camera.position.set(0, 0, radius * 2.1);
 
       let drag = false;
@@ -116,6 +118,7 @@ export function LipidViewer3D({ smiles, name }: { smiles: string; name: string }
       };
       const wheel = (e: WheelEvent) => {
         e.preventDefault();
+        zoomed = true;
         camera.position.z = Math.max(radius * 0.8, Math.min(radius * 5, camera.position.z + e.deltaY * 0.01));
       };
       const c = renderer.domElement;
@@ -130,6 +133,11 @@ export function LipidViewer3D({ smiles, name }: { smiles: string; name: string }
         const h = el.clientHeight || 1;
         renderer.setSize(w, h, false);
         camera.aspect = w / h;
+        if (!zoomed) {
+          const vHalf = (camera.fov * Math.PI) / 360;
+          const hHalf = Math.atan(Math.tan(vHalf) * camera.aspect);
+          camera.position.z = (bsphere * 1.12) / Math.sin(Math.min(vHalf, hHalf));
+        }
         camera.updateProjectionMatrix();
       };
       resize();

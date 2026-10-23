@@ -79,9 +79,9 @@ function Structure() {
               <div className="relative flex-1 min-h-[460px]"><div className="absolute inset-0"><LipidViewer3D smiles={lipid.smiles} name={lipid.name} /></div></div>
               <p className="mt-3 font-mono text-[10px] text-ink-soft break-all">SMILES · {lipid.smiles}</p>
             </div>
-            <div className="col-span-12 lg:col-span-4 rounded-xl bg-panel ring-1 ring-black/5 p-4">
+            <div className="col-span-12 lg:col-span-4 rounded-xl bg-panel ring-1 ring-black/5 p-4 flex flex-col">
               <h2 className="text-[13px] font-semibold tracking-tight mb-3">Lipid library</h2>
-              <div className="grid grid-cols-2 gap-1.5">
+              <div className="grid grid-cols-2 gap-1.5 flex-1 auto-rows-fr">
                 {LIPID_LIBRARY.map((l) => (
                   <button
                     key={l.id}
@@ -126,15 +126,15 @@ function Structure() {
                 Cα trace of chain A from PDB 1TUP (Cho et al., 1994). The marker sits on the mutated residue.
               </p>
             </div>
-            <div className="col-span-12 lg:col-span-4 rounded-xl bg-panel ring-1 ring-black/5 p-4">
+            <div className="col-span-12 lg:col-span-4 rounded-xl bg-panel ring-1 ring-black/5 p-4 flex flex-col">
               <h2 className="text-[13px] font-semibold tracking-tight mb-3">TP53 variant</h2>
-              <div className="flex flex-wrap gap-1.5">
+              <div className="grid grid-cols-4 gap-1.5 flex-1 auto-rows-fr">
                 {TP53_VARIANTS.map((v) => (
                   <button
                     key={v.id}
                     type="button"
                     onClick={() => setVariantId(v.id)}
-                    className={`font-mono text-[11px] px-2 py-1 rounded-md transition-colors ${
+                    className={`font-mono text-[11px] px-2 py-1 rounded-md transition-colors grid place-items-center ${
                       v.id === variantId ? "bg-ink text-paper" : "bg-paper ring-1 ring-line text-ink-soft hover:bg-primary/5"
                     }`}
                   >
@@ -160,18 +160,18 @@ function Structure() {
 
         {tab === "sequence" ? (
           <div className="grid grid-cols-12 gap-4 flex-1">
-            <div className="col-span-12 xl:col-span-9 rounded-xl bg-panel ring-1 ring-black/5 p-4">
+            <div className="col-span-12 xl:col-span-9 rounded-xl bg-panel ring-1 ring-black/5 p-4 h-full">
               <SequencePanel variantId={variantId} />
             </div>
-            <div className="col-span-12 xl:col-span-3 rounded-xl bg-panel ring-1 ring-black/5 p-4">
+            <div className="col-span-12 xl:col-span-3 rounded-xl bg-panel ring-1 ring-black/5 p-4 flex flex-col">
               <h2 className="text-[13px] font-semibold tracking-tight mb-3">Variant</h2>
-              <div className="flex flex-wrap gap-1.5">
+              <div className="grid grid-cols-4 gap-1.5 auto-rows-fr">
                 {TP53_VARIANTS.map((v) => (
                   <button
                     key={v.id}
                     type="button"
                     onClick={() => setVariantId(v.id)}
-                    className={`font-mono text-[11px] px-2 py-1 rounded-md transition-colors ${
+                    className={`font-mono text-[11px] px-2 py-1 rounded-md transition-colors grid place-items-center ${
                       v.id === variantId ? "bg-ink text-paper" : "bg-paper ring-1 ring-line text-ink-soft hover:bg-primary/5"
                     }`}
                   >

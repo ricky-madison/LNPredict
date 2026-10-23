@@ -185,7 +185,7 @@ function Validation() {
             <h3 className="mt-5 mb-2 font-mono text-[10px] uppercase tracking-[0.16em] text-ink-soft">
               Residual by formulation · sorted by |error|
             </h3>
-            <ul className="grid gap-x-8 gap-y-1.5 xl:grid-cols-2 flex-1 content-start">
+            <ul className="grid gap-x-8 gap-y-1.5 xl:grid-cols-2 flex-1 auto-rows-fr">
               {devs.map((d) => (
                 <li key={d.id} className="grid grid-cols-[2.5rem_minmax(0,1fr)_5.5rem] items-center gap-3 font-mono text-[11px]">
                   <span className="font-bold">{d.id}</span>
