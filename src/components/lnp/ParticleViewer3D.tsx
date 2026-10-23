@@ -131,13 +131,13 @@ export function ParticleViewer3D(props: ParticleViewerProps) {
         new THREE.MeshStandardMaterial({ color: 0xe0b34a, roughness: 0.45, emissive: 0x3a2a05 }),
         60,
       );
-      const up = new THREE.Vector3(0, 1, 0);
+      const yAxis = new THREE.Vector3(0, 1, 0);
       for (let i = 0; i < 60; i++) {
         const phi = Math.acos(1 - (2 * (i + 0.5)) / 60);
         const theta = Math.PI * (1 + Math.sqrt(5)) * i * 1.37;
         const dir = new THREE.Vector3(Math.sin(phi) * Math.cos(theta), Math.cos(phi), Math.sin(phi) * Math.sin(theta));
         dummy.position.copy(dir.clone().multiplyScalar(2.3));
-        dummy.quaternion.setFromUnitVectors(up, dir);
+        dummy.quaternion.setFromUnitVectors(yAxis, dir);
         dummy.scale.setScalar(1);
         dummy.updateMatrix();
         ligands.setMatrixAt(i, dummy.matrix);
