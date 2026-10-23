@@ -99,7 +99,7 @@ export function ParticleViewer3D(props: ParticleViewerProps) {
 
       // bumpy nucleic-acid / lipid-complex core
       const coreGeo = new THREE.IcosahedronGeometry(1.0, 4);
-      const pos = coreGeo.attributes.position;
+      const pos = coreGeo.getAttribute("position");
       const v = new THREE.Vector3();
       for (let i = 0; i < pos.count; i++) {
         v.fromBufferAttribute(pos, i).normalize();
