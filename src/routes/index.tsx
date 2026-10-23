@@ -116,12 +116,12 @@ function Designer() {
       />
 
 
-      <main className="px-5 py-5">
+      <main className="px-4 py-4 2xl:px-6">
         <h1 className="sr-only">LNPredict — in silico lipid nanoparticle formulation platform</h1>
         <div className="grid grid-cols-12 gap-4">
           {/* PARAMETER RAIL */}
           <aside className="col-span-12 lg:col-span-4 xl:col-span-3">
-            <div className="rounded-xl bg-panel ring-1 ring-black/5 p-4 sticky top-4">
+            <div className="rounded-xl bg-panel ring-1 ring-black/5 p-4 h-full">
               <div className="flex items-baseline justify-between mb-4">
                 <h2 className="text-[13px] font-semibold tracking-tight">Formulation parameters</h2>
                 <span className="font-mono text-[10px] text-ink-soft/60">01</span>
@@ -324,12 +324,10 @@ function Designer() {
               </button>
             </div>
           </aside>
-
-          {/* READOUT */}
-          <section className="col-span-12 lg:col-span-8 xl:col-span-9">
-            <div className="grid grid-cols-12 gap-4">
+          {/* CENTRE: report + alternates + microfluidic */}
+          <div className="col-span-12 lg:col-span-8 xl:col-span-5 flex flex-col gap-4">
               {/* report card */}
-              <div className="col-span-12 xl:col-span-7 rounded-xl bg-panel ring-1 ring-black/5 p-5">
+              <div className="rounded-xl bg-panel ring-1 ring-black/5 p-5">
                 <div className="flex items-start justify-between">
                   <div>
                     <p className="font-mono text-[10px] uppercase tracking-[0.18em] text-accent-ink">
@@ -417,8 +415,6 @@ function Designer() {
                 </div>
               </div>
 
-              {/* alternates + process */}
-              <div className="col-span-12 xl:col-span-5 flex flex-col gap-4">
                 <div className="rounded-xl bg-panel ring-1 ring-black/5 p-4">
                   <div className="flex items-baseline justify-between mb-3">
                     <h2 className="text-[13px] font-semibold tracking-tight">Top-3 alternate lipids</h2>
@@ -464,7 +460,45 @@ function Designer() {
                   </ol>
                 </div>
 
-                <div className="rounded-xl bg-panel ring-1 ring-black/5 p-4">
+
+
+                <div className="rounded-xl bg-panel ring-1 ring-black/5 p-4 flex-1 flex flex-col">
+                  <div className="flex items-baseline justify-between mb-3">
+                    <h2 className="text-[13px] font-semibold tracking-tight">Microfluidic alignment</h2>
+                    <span className="font-mono text-[10px] text-ink-soft/60">04</span>
+                  </div>
+                  <div className="flex-1 min-h-[140px] rounded-lg bg-ink overflow-hidden flex flex-col justify-evenly px-4 py-3">
+                    {Array.from({ length: 5 }).map((_, row) => (
+                      <div key={row} className="flex items-center justify-between">
+                        {Array.from({ length: 22 }).map((_, i) => {
+                          const jitter = lead.pdi * 60;
+                          const size = 8 + (lead.size - 42) / 10;
+                          return (
+                            <span
+                              key={i}
+                              className="rounded-full bg-primary transition-all duration-500"
+                              style={{
+                                width: `${size}px`,
+                                height: `${size}px`,
+                                transform: `translateY(${(((i + row) % 3) - 1) * jitter}px)`,
+                                opacity: 0.5 + (((i + row) % 4) * 0.12),
+                              }}
+                            />
+                          );
+                        })}
+                      </div>
+                    ))}
+                  </div>
+                  <p className="font-mono text-[10px] text-ink-soft mt-2 text-pretty">
+                    {lead.pdi < 0.2 ? "Droplets snap into monodisperse alignment" : "Population is polydisperse"} ·
+                    flow {fmt(input.flowRatio)}:1, {fmt(input.flowRate)} mL/min · D₅₀ {fmt(lead.size)} nm
+                  </p>
+                </div>
+              </div>
+
+          {/* RIGHT: large 3D particle viewer */}
+          <div className="col-span-12 xl:col-span-4 flex flex-col">
+                <div className="rounded-xl bg-panel ring-1 ring-black/5 p-4 flex flex-col flex-1">
                   <div className="flex items-baseline justify-between mb-3">
                     <h2 className="text-[13px] font-semibold tracking-tight">3D particle cross-section</h2>
                     <Link
@@ -474,7 +508,7 @@ function Designer() {
                       molecular viewer →
                     </Link>
                   </div>
-                  <ParticleViewer3D
+                  <div className="relative flex-1 min-h-[440px]"><div className="absolute inset-0"><ParticleViewer3D
                     sizeNm={lead.size}
                     pdi={lead.pdi}
                     ionizablePct={input.ionizablePct}
@@ -486,39 +520,9 @@ function Designer() {
                     platformId={input.platformId}
                     ligandPct={targeting.ligand ? input.ligandPct : 0}
                     sortPct={input.sortPct}
-                  />
+                  /></div></div>
                 </div>
-
-
-                <div className="rounded-xl bg-panel ring-1 ring-black/5 p-4 flex-1">
-                  <div className="flex items-baseline justify-between mb-3">
-                    <h2 className="text-[13px] font-semibold tracking-tight">Microfluidic alignment</h2>
-                    <span className="font-mono text-[10px] text-ink-soft/60">04</span>
-                  </div>
-                  <div className="h-[120px] rounded-lg bg-ink overflow-hidden flex items-center px-4 gap-2">
-                    {Array.from({ length: 12 }).map((_, i) => {
-                      const jitter = lead.pdi * 46;
-                      const size = 8 + (lead.size - 42) / 12;
-                      return (
-                        <span
-                          key={i}
-                          className="rounded-full bg-primary transition-all duration-500"
-                          style={{
-                            width: `${size}px`,
-                            height: `${size}px`,
-                            transform: `translateY(${((i % 3) - 1) * jitter}px)`,
-                            opacity: 0.55 + ((i % 4) * 0.12),
-                          }}
-                        />
-                      );
-                    })}
-                  </div>
-                  <p className="font-mono text-[10px] text-ink-soft mt-2 text-pretty">
-                    {lead.pdi < 0.2 ? "Droplets snap into monodisperse alignment" : "Population is polydisperse"} ·
-                    flow {fmt(input.flowRatio)}:1, {fmt(input.flowRate)} mL/min · D₅₀ {fmt(lead.size)} nm
-                  </p>
-                </div>
-              </div>
+          </div>
 
               {/* lipid library */}
               <div className="col-span-12 rounded-xl bg-panel ring-1 ring-black/5">
@@ -651,8 +655,6 @@ function Designer() {
                 </div>
                 <PaperModules input={input} set={set} result={result} />
               </div>
-            </div>
-          </section>
         </div>
       </main>
     </div>

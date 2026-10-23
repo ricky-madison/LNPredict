@@ -88,7 +88,10 @@ export function ProteinViewer3D({ residue, variantId }: { residue: number | null
 
       const box = new THREE.Box3().setFromObject(tube);
       const radius = box.getSize(new THREE.Vector3()).length() / 2 || 30;
-      camera.position.set(0, 0, radius * 2.2);
+      let zoomed = false;
+      const bsphere = box.getBoundingSphere(new THREE.Sphere()).radius || radius;
+      const reach = Math.max(bsphere, ...root.children.map((c) => c.position.length() + 0.6));
+      camera.position.set(0, 0, radius * 2.1);
 
       let drag = false;
       let px = 0;
@@ -115,6 +118,7 @@ export function ProteinViewer3D({ residue, variantId }: { residue: number | null
       };
       const wheel = (e: WheelEvent) => {
         e.preventDefault();
+        zoomed = true;
         camera.position.z = Math.max(radius, Math.min(radius * 5, camera.position.z + e.deltaY * 0.05));
       };
       const cv = renderer.domElement;
@@ -129,6 +133,11 @@ export function ProteinViewer3D({ residue, variantId }: { residue: number | null
         const h = el.clientHeight || 1;
         renderer.setSize(w, h, false);
         camera.aspect = w / h;
+        if (!zoomed) {
+          const vHalf = (camera.fov * Math.PI) / 360;
+          const hHalf = Math.atan(Math.tan(vHalf) * camera.aspect);
+          camera.position.z = (reach * 1.12) / Math.sin(Math.min(vHalf, hHalf));
+        }
         camera.updateProjectionMatrix();
       };
       resize();
@@ -171,8 +180,8 @@ export function ProteinViewer3D({ residue, variantId }: { residue: number | null
   }, [chain]);
 
   return (
-    <div className="relative">
-      <div ref={host} className="h-[320px] w-full rounded-lg bg-ink overflow-hidden" />
+    <div className="relative h-full min-h-[320px]">
+      <div ref={host} className="absolute inset-0 rounded-lg bg-ink overflow-hidden" />
       {status !== "ready" ? (
         <div className="absolute inset-0 grid place-items-center font-mono text-[11px] text-paper/70 px-6 text-center">
           {status === "loading" ? "Fetching PDB 1TUP (p53 core domain)…" : "Could not reach the PDB — structure unavailable offline."}

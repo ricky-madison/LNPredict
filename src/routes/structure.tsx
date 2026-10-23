@@ -42,10 +42,10 @@ function Structure() {
   const residue = VARIANT_RESIDUE[variantId] ?? null;
 
   return (
-    <div className="min-h-screen bg-paper text-ink">
+    <div className="min-h-screen flex flex-col bg-paper text-ink">
       <SiteHeader subtitle="3D structures · SMILES embedding · PDB 1TUP" />
 
-      <main className="px-5 py-5">
+      <main className="flex-1 flex flex-col px-4 py-4 2xl:px-6">
         <h1 className="sr-only">Molecular viewer for ionizable lipids, p53 structure and the TP53 mRNA cargo</h1>
 
         <div className="flex flex-wrap gap-1.5 mb-4">
@@ -70,28 +70,29 @@ function Structure() {
         </div>
 
         {tab === "lipid" ? (
-          <div className="grid grid-cols-12 gap-4">
-            <div className="col-span-12 lg:col-span-8 rounded-xl bg-panel ring-1 ring-black/5 p-4">
+          <div className="grid grid-cols-12 gap-4 flex-1">
+            <div className="col-span-12 lg:col-span-8 rounded-xl bg-panel ring-1 ring-black/5 p-4 flex flex-col">
               <div className="flex items-baseline justify-between mb-3">
                 <h2 className="text-[13px] font-semibold tracking-tight">{lipid.name}</h2>
                 <span className="font-mono text-[10px] text-ink-soft/60">01</span>
               </div>
-              <LipidViewer3D smiles={lipid.smiles} name={lipid.name} />
+              <div className="relative flex-1 min-h-[460px]"><div className="absolute inset-0"><LipidViewer3D smiles={lipid.smiles} name={lipid.name} /></div></div>
               <p className="mt-3 font-mono text-[10px] text-ink-soft break-all">SMILES · {lipid.smiles}</p>
             </div>
-            <div className="col-span-12 lg:col-span-4 rounded-xl bg-panel ring-1 ring-black/5 p-4">
+            <div className="col-span-12 lg:col-span-4 rounded-xl bg-panel ring-1 ring-black/5 p-4 flex flex-col">
               <h2 className="text-[13px] font-semibold tracking-tight mb-3">Lipid library</h2>
-              <div className="grid grid-cols-2 gap-1.5 max-h-[240px] overflow-y-auto pr-1">
+              <div className="grid gap-1.5 flex-1 auto-rows-fr">
                 {LIPID_LIBRARY.map((l) => (
                   <button
                     key={l.id}
                     type="button"
                     onClick={() => setLipidId(l.id)}
-                    className={`text-left font-mono text-[10px] px-2 py-1.5 rounded-md transition-colors ${
+                    className={`flex items-center justify-between gap-3 text-left font-mono text-[11px] px-3 rounded-md transition-colors ${
                       l.id === lipidId ? "bg-ink text-paper" : "bg-paper ring-1 ring-line text-ink-soft hover:bg-primary/5"
                     }`}
                   >
-                    {l.name}
+                    <span className="font-bold">{l.name}</span>
+                    <span className="opacity-70">pKa {l.pKa.toFixed(2)} · {l.tail}</span>
                   </button>
                 ))}
               </div>
@@ -115,30 +116,31 @@ function Structure() {
         ) : null}
 
         {tab === "protein" ? (
-          <div className="grid grid-cols-12 gap-4">
-            <div className="col-span-12 lg:col-span-8 rounded-xl bg-panel ring-1 ring-black/5 p-4">
+          <div className="grid grid-cols-12 gap-4 flex-1">
+            <div className="col-span-12 lg:col-span-8 rounded-xl bg-panel ring-1 ring-black/5 p-4 flex flex-col">
               <div className="flex items-baseline justify-between mb-3">
                 <h2 className="text-[13px] font-semibold tracking-tight">p53 core domain · {variantId}</h2>
                 <span className="font-mono text-[10px] text-ink-soft/60">01</span>
               </div>
-              <ProteinViewer3D residue={residue} variantId={variantId} />
+              <div className="relative flex-1 min-h-[460px]"><div className="absolute inset-0"><ProteinViewer3D residue={residue} variantId={variantId} /></div></div>
               <p className="mt-3 font-mono text-[10px] text-ink-soft text-pretty">
                 Cα trace of chain A from PDB 1TUP (Cho et al., 1994). The marker sits on the mutated residue.
               </p>
             </div>
-            <div className="col-span-12 lg:col-span-4 rounded-xl bg-panel ring-1 ring-black/5 p-4">
+            <div className="col-span-12 lg:col-span-4 rounded-xl bg-panel ring-1 ring-black/5 p-4 flex flex-col">
               <h2 className="text-[13px] font-semibold tracking-tight mb-3">TP53 variant</h2>
-              <div className="flex flex-wrap gap-1.5">
+              <div className="grid gap-1.5 flex-1 auto-rows-fr">
                 {TP53_VARIANTS.map((v) => (
                   <button
                     key={v.id}
                     type="button"
                     onClick={() => setVariantId(v.id)}
-                    className={`font-mono text-[11px] px-2 py-1 rounded-md transition-colors ${
+                    className={`flex items-center justify-between gap-3 text-left font-mono text-[11px] px-3 rounded-md transition-colors ${
                       v.id === variantId ? "bg-ink text-paper" : "bg-paper ring-1 ring-line text-ink-soft hover:bg-primary/5"
                     }`}
                   >
-                    {v.id}
+                    <span className="font-bold">{v.id}</span>
+                    <span className="opacity-70">{v.klass} class</span>
                   </button>
                 ))}
               </div>
@@ -159,19 +161,19 @@ function Structure() {
         ) : null}
 
         {tab === "sequence" ? (
-          <div className="grid grid-cols-12 gap-4">
-            <div className="col-span-12 xl:col-span-9 rounded-xl bg-panel ring-1 ring-black/5 p-4">
+          <div className="grid grid-cols-12 gap-4 flex-1">
+            <div className="col-span-12 xl:col-span-9 rounded-xl bg-panel ring-1 ring-black/5 p-4 h-full">
               <SequencePanel variantId={variantId} />
             </div>
-            <div className="col-span-12 xl:col-span-3 rounded-xl bg-panel ring-1 ring-black/5 p-4">
+            <div className="col-span-12 xl:col-span-3 rounded-xl bg-panel ring-1 ring-black/5 p-4 flex flex-col">
               <h2 className="text-[13px] font-semibold tracking-tight mb-3">Variant</h2>
-              <div className="flex flex-wrap gap-1.5">
+              <div className="grid grid-cols-4 gap-1.5 auto-rows-fr">
                 {TP53_VARIANTS.map((v) => (
                   <button
                     key={v.id}
                     type="button"
                     onClick={() => setVariantId(v.id)}
-                    className={`font-mono text-[11px] px-2 py-1 rounded-md transition-colors ${
+                    className={`font-mono text-[11px] px-2 py-1 rounded-md transition-colors grid place-items-center ${
                       v.id === variantId ? "bg-ink text-paper" : "bg-paper ring-1 ring-line text-ink-soft hover:bg-primary/5"
                     }`}
                   >
