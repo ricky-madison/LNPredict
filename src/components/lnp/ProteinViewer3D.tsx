@@ -90,6 +90,7 @@ export function ProteinViewer3D({ residue, variantId }: { residue: number | null
       const radius = box.getSize(new THREE.Vector3()).length() / 2 || 30;
       let zoomed = false;
       const bsphere = box.getBoundingSphere(new THREE.Sphere()).radius || radius;
+      const reach = Math.max(bsphere, ...root.children.map((c) => c.position.length() + 0.6));
       camera.position.set(0, 0, radius * 2.1);
 
       let drag = false;
@@ -135,7 +136,7 @@ export function ProteinViewer3D({ residue, variantId }: { residue: number | null
         if (!zoomed) {
           const vHalf = (camera.fov * Math.PI) / 360;
           const hHalf = Math.atan(Math.tan(vHalf) * camera.aspect);
-          camera.position.z = (bsphere * 1.12) / Math.sin(Math.min(vHalf, hHalf));
+          camera.position.z = (reach * 1.12) / Math.sin(Math.min(vHalf, hHalf));
         }
         camera.updateProjectionMatrix();
       };

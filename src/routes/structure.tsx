@@ -81,17 +81,18 @@ function Structure() {
             </div>
             <div className="col-span-12 lg:col-span-4 rounded-xl bg-panel ring-1 ring-black/5 p-4 flex flex-col">
               <h2 className="text-[13px] font-semibold tracking-tight mb-3">Lipid library</h2>
-              <div className="grid grid-cols-2 gap-1.5 flex-1 auto-rows-fr">
+              <div className="grid gap-1.5 flex-1 auto-rows-fr">
                 {LIPID_LIBRARY.map((l) => (
                   <button
                     key={l.id}
                     type="button"
                     onClick={() => setLipidId(l.id)}
-                    className={`text-left font-mono text-[10px] px-2 py-1.5 rounded-md transition-colors ${
+                    className={`flex items-center justify-between gap-3 text-left font-mono text-[11px] px-3 rounded-md transition-colors ${
                       l.id === lipidId ? "bg-ink text-paper" : "bg-paper ring-1 ring-line text-ink-soft hover:bg-primary/5"
                     }`}
                   >
-                    {l.name}
+                    <span className="font-bold">{l.name}</span>
+                    <span className="opacity-70">pKa {l.pKa.toFixed(2)} · {l.tail}</span>
                   </button>
                 ))}
               </div>
@@ -128,17 +129,18 @@ function Structure() {
             </div>
             <div className="col-span-12 lg:col-span-4 rounded-xl bg-panel ring-1 ring-black/5 p-4 flex flex-col">
               <h2 className="text-[13px] font-semibold tracking-tight mb-3">TP53 variant</h2>
-              <div className="grid grid-cols-4 gap-1.5 flex-1 auto-rows-fr">
+              <div className="grid gap-1.5 flex-1 auto-rows-fr">
                 {TP53_VARIANTS.map((v) => (
                   <button
                     key={v.id}
                     type="button"
                     onClick={() => setVariantId(v.id)}
-                    className={`font-mono text-[11px] px-2 py-1 rounded-md transition-colors grid place-items-center ${
+                    className={`flex items-center justify-between gap-3 text-left font-mono text-[11px] px-3 rounded-md transition-colors ${
                       v.id === variantId ? "bg-ink text-paper" : "bg-paper ring-1 ring-line text-ink-soft hover:bg-primary/5"
                     }`}
                   >
-                    {v.id}
+                    <span className="font-bold">{v.id}</span>
+                    <span className="opacity-70">{v.klass} class</span>
                   </button>
                 ))}
               </div>
