@@ -43,6 +43,8 @@ export const Route = createFileRoute("/paper")({
   component: PaperPage,
 });
 
+const r2 = (n: number) => Math.round(n * 100) / 100;
+
 function Th({ children }: { children?: ReactNode }) {
   return <th className="px-3 py-2 font-medium align-bottom">{children}</th>;
 }
@@ -97,7 +99,7 @@ function Fig1() {
         <g>
           {Array.from({ length: 18 }).map((_, i) => {
             const a = (i / 18) * Math.PI * 2;
-            return <line key={i} x1={60 + 44 * Math.cos(a)} y1={60 + 44 * Math.sin(a)} x2={60 + 55 * Math.cos(a)} y2={60 + 55 * Math.sin(a)} className="stroke-rust" strokeWidth="2" />;
+            return <line key={i} x1={r2(60 + 44 * Math.cos(a))} y1={r2(60 + 44 * Math.sin(a))} x2={r2(60 + 55 * Math.cos(a))} y2={r2(60 + 55 * Math.sin(a))} className="stroke-rust" strokeWidth="2" />;
           })}
           <circle cx="60" cy="60" r="44" className="fill-primary/20 stroke-primary" strokeWidth="4" />
           <circle cx="60" cy="60" r="24" className="fill-ink" />
@@ -113,7 +115,7 @@ function Fig1() {
         <g>
           {Array.from({ length: 18 }).map((_, i) => {
             const a = (i / 18) * Math.PI * 2;
-            return <line key={i} x1={60 + 44 * Math.cos(a)} y1={60 + 44 * Math.sin(a)} x2={60 + 55 * Math.cos(a)} y2={60 + 55 * Math.sin(a)} className="stroke-rust" strokeWidth="2" />;
+            return <line key={i} x1={r2(60 + 44 * Math.cos(a))} y1={r2(60 + 44 * Math.sin(a))} x2={r2(60 + 55 * Math.cos(a))} y2={r2(60 + 55 * Math.sin(a))} className="stroke-rust" strokeWidth="2" />;
           })}
           <circle cx="60" cy="60" r="44" className="fill-primary/15 stroke-primary" strokeWidth="4" />
           <circle cx="60" cy="60" r="28" className="fill-accent-ink/70" />
