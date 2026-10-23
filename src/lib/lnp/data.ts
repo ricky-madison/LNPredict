@@ -1,4 +1,4 @@
-export type CargoType = "mRNA" | "siRNA" | "miRNA" | "CRISPR";
+export type CargoType = "mRNA" | "siRNA" | "dual" | "miRNA" | "CRISPR";
 
 export interface IonizableLipid {
   id: string;
@@ -65,26 +65,47 @@ export const TP53_VARIANTS: Variant[] = [
   { id: "null", aa: "TP53-null", klass: "Null", mechanism: "Complete loss of expression", gofRisk: 0.1 },
 ];
 
-export interface TargetingEntry {
-  cancer: string;
+/** Active-targeting ligands — paper Table 2 (ligand, receptor, cancer types, status, key limitations). */
+export interface LigandSpec {
+  id: string;
+  strategy: string;
   ligand: string;
-  receptor: string;
-  rationale: string;
+  target: string;
+  cancers: string[];
   status: string;
-  affinity: string;
+  limitation: string;
 }
 
-/** Targeting decision table (paper Table 2). */
-export const TARGETING_TABLE: TargetingEntry[] = [
-  { cancer: "Ovarian", ligand: "Folate", receptor: "FR-α", rationale: "FR-α overexpressed in 80% of epithelial ovarian tumours", status: "Phase II", affinity: "0.8 nM" },
-  { cancer: "Breast (TNBC)", ligand: "Transferrin", receptor: "TfR / CD71", rationale: "TfR upregulated with high proliferative iron demand", status: "Phase I", affinity: "4 nM" },
-  { cancer: "Pancreatic", ligand: "cRGD peptide", receptor: "αvβ3 integrin", rationale: "Integrin-rich desmoplastic stroma and neovasculature", status: "Preclinical", affinity: "12 nM" },
-  { cancer: "NSCLC", ligand: "Anti-EGFR Fab", receptor: "EGFR", rationale: "EGFR amplification frequent in TP53-mutant NSCLC", status: "Phase I", affinity: "2 nM" },
-  { cancer: "Colorectal", ligand: "Anti-EpCAM scFv", receptor: "EpCAM", rationale: "EpCAM homogeneously expressed in colorectal adenocarcinoma", status: "Preclinical", affinity: "6 nM" },
-  { cancer: "Hepatocellular", ligand: "GalNAc", receptor: "ASGPR", rationale: "Hepatocyte-restricted ASGPR gives first-pass liver tropism", status: "Approved (siRNA)", affinity: "0.4 nM" },
-  { cancer: "Glioblastoma", ligand: "Angiopep-2", receptor: "LRP-1", rationale: "LRP-1 mediated transcytosis across the blood-brain barrier", status: "Phase II", affinity: "18 nM" },
-  { cancer: "Prostate", ligand: "PSMA aptamer", receptor: "PSMA", rationale: "PSMA highly restricted to prostate epithelium", status: "Phase I", affinity: "9 nM" },
-  { cancer: "Head & neck", ligand: "Hyaluronic acid", receptor: "CD44", rationale: "CD44-high cancer stem-like compartment", status: "Preclinical", affinity: "30 nM" },
+export const LIGANDS: LigandSpec[] = [
+  { id: "folate", strategy: "Folate", ligand: "Folic acid", target: "FR-α", cancers: ["Ovarian", "Breast"], status: "Platform (preclinical; clinical phases refer to general ligand use, not p53-specific products)", limitation: "Off-target accumulation in kidneys; requires high FR-α expression" },
+  { id: "transferrin", strategy: "Transferrin", ligand: "Transferrin", target: "TfR", cancers: ["Glioma / GBM", "Leukemia"], status: "Platform (preclinical; clinical phases refer to general ligand use, not p53-specific products)", limitation: "Competition with endogenous transferrin; receptor saturation" },
+  { id: "rgd", strategy: "RGD peptide", ligand: "cRGDfK", target: "αvβ3 integrin", cancers: ["Melanoma", "Glioma / GBM"], status: "Platform (preclinical; clinical phases refer to general ligand use, not p53-specific products)", limitation: "Lower affinity for human vs. murine integrins; off-target in bone" },
+  { id: "her2", strategy: "Anti-HER2", ligand: "Trastuzumab Fab", target: "HER2", cancers: ["Breast", "Gastric"], status: "Platform (preclinical; clinical phases refer to general ligand use, not p53-specific products)", limitation: "Potential cardiotoxicity; internalization variability" },
+  { id: "egfr", strategy: "Anti-EGFR", ligand: "Cetuximab Fab", target: "EGFR", cancers: ["Colorectal", "HNSCC"], status: "Platform (preclinical; clinical phases refer to general ligand use, not p53-specific products)", limitation: "Skin toxicity; mutations affecting binding" },
+  { id: "as1411", strategy: "Aptamer", ligand: "AS1411", target: "Nucleolin", cancers: ["Leukemia", "Breast"], status: "Preclinical", limitation: "Nuclease degradation in vivo; rapid clearance" },
+  { id: "ha", strategy: "Hyaluronic acid", ligand: "HA oligos", target: "CD44", cancers: ["Breast", "Colorectal", "Ovarian"], status: "Platform (preclinical; clinical phases refer to general ligand use, not p53-specific products)", limitation: "Rapid clearance; CD44 isoform specificity" },
+];
+
+export interface CancerSpec {
+  id: string;
+  /** default Table 2 ligand; "none" = no Table 2 ligand — passive EPR / route-based delivery */
+  ligandId: string;
+  evidence: string;
+}
+
+/** Cancer contexts named in the paper, with the targeting route the text supports for each. */
+export const CANCERS: CancerSpec[] = [
+  { id: "Ovarian", ligandId: "folate", evidence: "Folate/HA targeting for ovarian contexts; TP53 restoration strategies reviewed by Zhang et al. 2025." },
+  { id: "Breast", ligandId: "her2", evidence: "Trastuzumab-functionalised LNPs raise internalisation in HER2+ breast cancer and were combined with p53 mRNA (Lin et al. 2025)." },
+  { id: "Hepatocellular", ligandId: "none", evidence: "p53 mRNA + checkpoint blockade reprogrammed the immune microenvironment in HCC models (Xiao et al. 2022). Standard ionizable LNPs are liver-dominant, so no Table 2 ligand is needed." },
+  { id: "NSCLC", ligandId: "none", evidence: "Peptide-lipid NPs (Zhang et al. 2026), inhaled macrophage-mediated delivery (Liu et al. 2026) and inhaled dual-targeted mRNA NPs (Tang et al. 2023); no Table 2 ligand." },
+  { id: "Pancreatic", ligandId: "none", evidence: "Dual-targeted extracellular vesicles delivering p53 mRNA with siKRAS (Chiang et al. 2023); no Table 2 ligand." },
+  { id: "Colorectal", ligandId: "egfr", evidence: "Anti-EGFR (cetuximab Fab) listed for colorectal in Table 2; p53-null HCT116 models used in Fig. 4." },
+  { id: "HNSCC", ligandId: "egfr", evidence: "Anti-EGFR (cetuximab Fab) listed for HNSCC; oral cancer chemoimmunotherapy with p53 mRNA reported." },
+  { id: "Glioma / GBM", ligandId: "transferrin", evidence: "Transferrin (glioma) and cRGDfK (GBM) are Table 2 options." },
+  { id: "Melanoma", ligandId: "rgd", evidence: "cRGDfK / αvβ3 integrin listed for melanoma in Table 2." },
+  { id: "Gastric", ligandId: "her2", evidence: "Anti-HER2 listed for gastric cancer in Table 2." },
+  { id: "Leukemia", ligandId: "transferrin", evidence: "Transferrin and AS1411 aptamer (nucleolin) are Table 2 options for leukemia." },
 ];
 
 export interface CargoSpec {
@@ -96,23 +117,41 @@ export interface CargoSpec {
 }
 
 export const CARGOS: CargoSpec[] = [
-  { id: "mRNA", label: "p53 mRNA", nucleotides: 1750, charge: -1750, note: "full-length TP53 CDS + UTRs, N1-Me-pseudo-U" },
-  { id: "siRNA", label: "mutp53 siRNA", nucleotides: 21, charge: -42, note: "allele-selective knockdown duplex" },
-  { id: "miRNA", label: "miR-34a mimic", nucleotides: 23, charge: -46, note: "p53 pathway effector mimic" },
-  { id: "CRISPR", label: "CRISPR base editor", nucleotides: 5200, charge: -5200, note: "ABE mRNA + sgRNA co-formulation" },
+  { id: "mRNA", label: "p53 mRNA (wild-type restoration)", nucleotides: 1750, charge: -1750, note: "full-length wild-type TP53 CDS + UTRs — for TP53-null / loss-of-function alleles" },
+  { id: "siRNA", label: "mutant-p53 siRNA (GOF silencing)", nucleotides: 21, charge: -42, note: "allele-selective duplex — for gain-of-function missense mutants" },
+  { id: "dual", label: "siRNA + mRNA dual cargo", nucleotides: 1771, charge: -1792, note: "silence mutant p53 and restore wild-type in one particle (coexisting clones)" },
+  { id: "miRNA", label: "miR-34a mimic (downstream axis)", nucleotides: 23, charge: -46, note: "engages p53 effector pathway regardless of mutation; less direct" },
+  { id: "CRISPR", label: "CRISPR-Cas9 (TP53 correction)", nucleotides: 5200, charge: -5200, note: "Cas9 + guide RNA for permanent correction; delivery and off-target hurdles" },
 ];
 
 export const RELEASE_TRIGGERS = [
-  { id: "ph", label: "pH (endosomal)", boost: 6, note: "protonation-driven, tumour acidosis synergy" },
-  { id: "redox", label: "Redox (GSH)", boost: 9, note: "disulfide cleavage in high-GSH cytosol" },
-  { id: "enzyme", label: "Enzyme (MMP-2)", boost: 5, note: "stroma protease-cleavable PEG shed" },
+  { id: "ph", label: "pH (endosomal / TME)", boost: 6, note: "ionizable-lipid protonation; TME pH 6.5–6.8, endosome pH 4.5–6.0" },
+  { id: "redox", label: "Redox (GSH)", boost: 9, note: "disulfide lipids cleaved by intracellular GSH (2–10 mM)" },
+  { id: "enzyme", label: "Enzyme (MMP-2/9)", boost: 5, note: "MMP-cleavable peptide enables tumour-specific dePEGylation" },
+  { id: "thermo", label: "Thermo (~41 °C)", boost: 4, note: "DPPC / NLC gel-to-liquid-crystalline transition above ~41 °C" },
+  { id: "ultrasound", label: "Ultrasound", boost: 3, note: "external, on-demand p53 cargo liberation" },
   { id: "none", label: "None", boost: 0, note: "constitutive release" },
 ] as const;
 
-export const PLATFORMS = [
-  { id: "ionizable", label: "Ionizable LNP", sizeBias: 0, encapBias: 0 },
-  { id: "liposome", label: "Liposome", sizeBias: 28, encapBias: -12 },
-  { id: "sln", label: "Solid lipid NP", sizeBias: 18, encapBias: -7 },
-  { id: "nlc", label: "NLC", sizeBias: 12, encapBias: -4 },
-  { id: "hybrid", label: "Lipid-polymer hybrid", sizeBias: 8, encapBias: 2 },
-] as const;
+/** LNP platforms — paper Table 1 (typical literature ranges). */
+export interface PlatformSpec {
+  id: string;
+  label: string;
+  sizeBias: number;
+  encapBias: number;
+  size: [number, number];
+  loading: [number, number];
+  encap: [number, number];
+  cargos: string[];
+  status: string;
+  limitation: string;
+  architecture: string;
+}
+
+export const PLATFORMS: PlatformSpec[] = [
+  { id: "ionizable", label: "Ionizable LNP", sizeBias: 0, encapBias: 0, size: [50, 150], loading: [10, 20], encap: [85, 95], cargos: ["mRNA", "siRNA", "sa-mRNA"], status: "Approved", limitation: "Liver-dominant biodistribution; anti-PEG immunogenicity", architecture: "pH-responsive ionizable lipid layer around a nucleic-acid core with PEG corona; pKa 6.0–7.0 optimum" },
+  { id: "liposome", label: "Liposome", sizeBias: 28, encapBias: -12, size: [80, 120], loading: [5, 10], encap: [80, 95], cargos: ["mRNA", "miRNA"], status: "Approved", limitation: "Low endosomal escape; rapid clearance if non-PEGylated", architecture: "Phospholipid bilayer (DSPC / DOPC / HSPC + cholesterol) around an aqueous core" },
+  { id: "sln", label: "Solid lipid NP", sizeBias: 18, encapBias: -7, size: [100, 300], loading: [2, 8], encap: [60, 80], cargos: ["siRNA", "hydrophobic"], status: "Phase I/II", limitation: "Low drug-loading capacity; burst release", architecture: "Solid lipid matrix (triglycerides, fatty acids, waxes) with cargo dispersed in it" },
+  { id: "nlc", label: "NLC", sizeBias: 12, encapBias: -4, size: [100, 250], loading: [5, 15], encap: [70, 90], cargos: ["mRNA", "siRNA"], status: "Preclinical", limitation: "Less stable than SLNs during long-term storage", architecture: "Blend of solid and liquid lipids that distorts the crystalline matrix" },
+  { id: "hybrid", label: "Lipid-polymer hybrid", sizeBias: 8, encapBias: 2, size: [100, 300], loading: [8, 20], encap: [80, 90], cargos: ["pDNA", "CRISPR"], status: "Preclinical", limitation: "Complex manufacturing; scalability challenges", architecture: "PLGA core, lipid shell and PEG corona; sustained release over days to weeks" },
+];
