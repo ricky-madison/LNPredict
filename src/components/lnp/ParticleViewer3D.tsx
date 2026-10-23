@@ -9,6 +9,12 @@ export interface ParticleViewerProps {
   pegPct: number;
   encapsulation: number;
   cargoLabel: string;
+  /** Table 1 architecture: ionizable | liposome | sln | nlc | hybrid */
+  platformId?: string;
+  /** targeting-ligand surface density (mol%) — drawn as receptor-binding moieties */
+  ligandPct?: number;
+  /** SORT charged-lipid fraction (mol%) — drawn as surface charge markers */
+  sortPct?: number;
 }
 
 /**
@@ -117,6 +123,44 @@ export function ParticleViewer3D(props: ParticleViewerProps) {
       }
       root.add(peg);
 
+      // targeting ligands (cones on stalks) protruding through the PEG corona
+      const ligGeo = new THREE.ConeGeometry(0.1, 0.34, 8);
+      ligGeo.translate(0, 0.17, 0);
+      const ligands = new THREE.InstancedMesh(
+        ligGeo,
+        new THREE.MeshStandardMaterial({ color: 0xe0b34a, roughness: 0.45, emissive: 0x3a2a05 }),
+        60,
+      );
+      const up = new THREE.Vector3(0, 1, 0);
+      for (let i = 0; i < 60; i++) {
+        const phi = Math.acos(1 - (2 * (i + 0.5)) / 60);
+        const theta = Math.PI * (1 + Math.sqrt(5)) * i * 1.37;
+        const dir = new THREE.Vector3(Math.sin(phi) * Math.cos(theta), Math.cos(phi), Math.sin(phi) * Math.sin(theta));
+        dummy.position.copy(dir.clone().multiplyScalar(2.3));
+        dummy.quaternion.setFromUnitVectors(up, dir);
+        dummy.scale.setScalar(1);
+        dummy.updateMatrix();
+        ligands.setMatrixAt(i, dummy.matrix);
+      }
+      dummy.quaternion.identity();
+      root.add(ligands);
+
+      // SORT charged-lipid markers on the lipid shell
+      const sortMarks = new THREE.InstancedMesh(
+        new THREE.SphereGeometry(0.075, 8, 8),
+        new THREE.MeshStandardMaterial({ color: 0xd9453d, roughness: 0.4, emissive: 0x4a0f0c }),
+        90,
+      );
+      for (let i = 0; i < 90; i++) {
+        const phi = Math.acos(1 - (2 * (i + 0.5)) / 90);
+        const theta = Math.PI * (1 + Math.sqrt(5)) * i * 0.83;
+        dummy.position.set(2.02 * Math.sin(phi) * Math.cos(theta), 2.02 * Math.cos(phi), 2.02 * Math.sin(phi) * Math.sin(theta));
+        dummy.scale.setScalar(1);
+        dummy.updateMatrix();
+        sortMarks.setMatrixAt(i, dummy.matrix);
+      }
+      root.add(sortMarks);
+
       // pointer orbit
       let drag = false;
       let px = 0;
@@ -176,6 +220,40 @@ export function ParticleViewer3D(props: ParticleViewerProps) {
         peg.visible = p.pegPct > 0.05;
         (shell.material as InstanceType<typeof THREE.MeshStandardMaterial>).opacity =
           0.4 + Math.min(0.4, p.pdi * 1.2);
+
+        // architecture (paper Fig. 1): A liposome, B SLN / NLC, C ionizable LNP, D lipid-polymer hybrid
+        const arch = p.platformId ?? "ionizable";
+        const coreMat = core.material as InstanceType<typeof THREE.MeshStandardMaterial>;
+        const innerMat = inner.material as InstanceType<typeof THREE.MeshStandardMaterial>;
+        if (arch === "liposome") {
+          inner.visible = true;
+          innerMat.opacity = 0.25;
+          core.visible = false;
+          strands.scale.setScalar(0.55);
+        } else if (arch === "sln" || arch === "nlc") {
+          inner.visible = true;
+          innerMat.opacity = arch === "sln" ? 0.85 : 0.65;
+          core.visible = true;
+          coreMat.color.setHex(arch === "sln" ? 0x8a6f3a : 0x6f8a62);
+          core.scale.setScalar(1.05);
+          strands.scale.setScalar(0.45);
+        } else if (arch === "hybrid") {
+          inner.visible = true;
+          innerMat.opacity = 0.4;
+          core.visible = true;
+          coreMat.color.setHex(0x5a6f9a); // PLGA core
+          core.scale.setScalar(1.25);
+          strands.scale.setScalar(0.4);
+        } else {
+          core.visible = true;
+          coreMat.color.setHex(0x2b3440);
+        }
+        const ligN = Math.round(Math.min(60, (p.ligandPct ?? 0) * 12));
+        ligands.count = ligN;
+        ligands.visible = ligN > 0;
+        const sortN = Math.round(Math.min(90, (p.sortPct ?? 0) * 3));
+        sortMarks.count = sortN;
+        sortMarks.visible = sortN > 0;
         renderer.render(scene, camera);
       };
       tick();
@@ -203,6 +281,8 @@ export function ParticleViewer3D(props: ParticleViewerProps) {
       <div ref={host} className="h-[260px] w-full rounded-lg bg-ink overflow-hidden" />
       <div className="pointer-events-none absolute left-3 bottom-3 font-mono text-[10px] text-paper/70 leading-relaxed">
         <span className="block text-primary">▸ {props.cargoLabel} core · {props.encapsulation.toFixed(0)}% encapsulated</span>
+        {(props.ligandPct ?? 0) > 0 ? <span className="block text-amber">◆ targeting ligand {props.ligandPct!.toFixed(1)} mol%</span> : null}
+        {(props.sortPct ?? 0) > 0 ? <span className="block text-rust">● SORT charged lipid {props.sortPct} mol%</span> : null}
         D₅₀ {props.sizeNm.toFixed(0)} nm · PDI {props.pdi.toFixed(3)} · drag to orbit
       </div>
     </div>
