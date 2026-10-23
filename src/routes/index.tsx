@@ -2,17 +2,20 @@ import { createFileRoute, Link } from "@tanstack/react-router";
 import { useMemo, useState } from "react";
 
 import {
+  CANCERS,
   CARGOS,
   HELPER_LIPIDS,
   PLATFORMS,
   RELEASE_TRIGGERS,
-  TARGETING_TABLE,
   TP53_VARIANTS,
   type CargoType,
 } from "@/lib/lnp/data";
 import { DEFAULT_INPUT, buildReport, runDesign, type DesignInput } from "@/lib/lnp/predict";
 import { printReport } from "@/lib/lnp/report-html";
+import { PAPER } from "@/lib/lnp/paper";
 import { ParticleViewer3D } from "@/components/lnp/ParticleViewer3D";
+import { Chip, Slider } from "@/components/lnp/controls";
+import { PaperModules } from "@/components/lnp/PaperModules";
 
 
 
@@ -23,7 +26,7 @@ export const Route = createFileRoute("/")({
       {
         name: "description",
         content:
-          "Turn a TP53 mutation into an optimised lipid nanoparticle formulation: ranked ionizable lipids, encapsulation, size, PDI, endosomal escape and targeting ligand.",
+          "Interactive companion to the peer-reviewed review on p53-targeted lipid nanoparticles: choose a p53 cargo, nanocarrier, targeting ligand and release trigger, and predict encapsulation, size, PDI and endosomal escape.",
       },
       { property: "og:title", content: "p53-LNP Designer — LNP Formulation Workbench" },
       {
@@ -47,66 +50,6 @@ function Field({ label, children, hint }: { label: string; children: React.React
       <div className="mt-1.5">{children}</div>
       {hint ? <p className="mt-1 font-mono text-[9px] text-ink-soft/60">{hint}</p> : null}
     </label>
-  );
-}
-
-function Chip({
-  active,
-  onClick,
-  children,
-}: {
-  active: boolean;
-  onClick: () => void;
-  children: React.ReactNode;
-}) {
-  return (
-    <button
-      type="button"
-      onClick={onClick}
-      className={`font-mono text-[11px] px-2 py-1 rounded-md transition-colors ${
-        active
-          ? "bg-ink text-paper"
-          : "bg-paper ring-1 ring-line text-ink-soft hover:bg-primary/5 hover:text-accent-ink"
-      }`}
-    >
-      {children}
-    </button>
-  );
-}
-
-function Slider({
-  label,
-  value,
-  min,
-  max,
-  step,
-  onChange,
-  display,
-}: {
-  label: string;
-  value: number;
-  min: number;
-  max: number;
-  step: number;
-  onChange: (v: number) => void;
-  display: string;
-}) {
-  return (
-    <div>
-      <div className="flex items-baseline justify-between">
-        <span className="font-mono text-[10px] uppercase tracking-[0.16em] text-ink-soft">{label}</span>
-        <span className="font-mono text-[12px] font-bold text-accent-ink">{display}</span>
-      </div>
-      <input
-        type="range"
-        className="mt-2 w-full"
-        min={min}
-        max={max}
-        step={step}
-        value={value}
-        onChange={(e) => onChange(Number(e.target.value))}
-      />
-    </div>
   );
 }
 
@@ -193,6 +136,12 @@ function Designer() {
             ↓ PDF spec
           </button>
           <Link
+            to="/paper"
+            className="font-mono text-[11px] font-medium text-ink-soft ring-1 ring-line rounded-lg py-2 px-3 hover:bg-primary/5 transition-colors"
+          >
+            Paper →
+          </Link>
+          <Link
             to="/validation"
             className="font-mono text-[11px] font-medium text-ink-soft ring-1 ring-line rounded-lg py-2 px-3 hover:bg-primary/5 transition-colors"
           >
@@ -231,15 +180,15 @@ function Designer() {
                   value={input.cancer}
                   onChange={(e) => set("cancer", e.target.value)}
                 >
-                  {TARGETING_TABLE.map((t) => (
-                    <option key={t.cancer}>{t.cancer}</option>
+                  {CANCERS.map((t) => (
+                    <option key={t.id}>{t.id}</option>
                   ))}
                 </select>
               </Field>
 
               <div className="mt-4">
                 <Field label="Cargo" hint={result.cargoNote}>
-                  <div className="grid grid-cols-4 gap-1.5">
+                  <div className="grid grid-cols-5 gap-1.5">
                     {CARGOS.map((c) => (
                       <button
                         key={c.id}
@@ -251,7 +200,7 @@ function Designer() {
                             : "bg-paper ring-1 ring-line text-ink-soft hover:bg-primary/5"
                         }`}
                       >
-                        {c.id}
+                        {c.id === "dual" ? "si+m" : c.id}
                       </button>
                     ))}
                   </div>
@@ -491,14 +440,14 @@ function Designer() {
                       Targeting ligand
                     </p>
                     <span className="font-mono text-[10px] px-2 py-0.5 rounded-full bg-primary/20 text-primary ring-1 ring-primary/40">
-                      {targeting.status}
+                      {targeting.ligand ? (targeting.ligand.status.startsWith("Platform") ? "Platform · preclinical" : targeting.ligand.status) : "Passive"}
                     </span>
                   </div>
                   <p className="mt-2 text-lg font-semibold tracking-tight">
-                    {targeting.ligand} · {targeting.receptor}
+                    {targeting.ligand ? `${targeting.ligand.ligand} · ${targeting.ligand.target}` : "Passive EPR · no Table 2 ligand"}
                   </p>
                   <p className="font-mono text-[11px] text-paper/60 mt-1">
-                    {targeting.rationale} · affinity {targeting.affinity}
+                    {targeting.evidence} · modelled tumour dose {fmt(targeting.modelledDose, 2)}% ID vs {fmt(targeting.passiveDose, 1)}% passive
                   </p>
                 </div>
               </div>
@@ -569,6 +518,9 @@ function Designer() {
                     pegPct={input.pegPct}
                     encapsulation={lead.encapsulation}
                     cargoLabel={input.cargo}
+                    platformId={input.platformId}
+                    ligandPct={targeting.ligand ? input.ligandPct : 0}
+                    sortPct={input.sortPct}
                   />
                 </div>
 
@@ -718,6 +670,21 @@ function Designer() {
                   </span>
                   <span>Predictions are in silico — validate in vitro before use.</span>
                 </div>
+              </div>
+
+              <div className="col-span-12">
+                <div className="flex items-baseline justify-between mt-2 mb-3">
+                  <h2 className="text-[13px] font-semibold tracking-tight">Paper framework modules</h2>
+                  <a
+                    href={PAPER.url}
+                    target="_blank"
+                    rel="noreferrer"
+                    className="font-mono text-[10px] text-accent-ink hover:underline"
+                  >
+                    Madison 2026 · doi:{PAPER.doi} ↗
+                  </a>
+                </div>
+                <PaperModules input={input} set={set} result={result} />
               </div>
             </div>
           </section>

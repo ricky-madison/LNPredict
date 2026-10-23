@@ -10,12 +10,18 @@
 
 import { Route as rootRouteImport } from './routes/__root'
 import { Route as IndexRouteImport } from './routes/index'
+import { Route as PaperRouteImport } from './routes/paper'
 import { Route as StructureRouteImport } from './routes/structure'
 import { Route as ValidationRouteImport } from './routes/validation'
 
 const IndexRoute = IndexRouteImport.update({
   id: '/',
   path: '/',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const PaperRoute = PaperRouteImport.update({
+  id: '/paper',
+  path: '/paper',
   getParentRoute: () => rootRouteImport,
 } as any)
 const StructureRoute = StructureRouteImport.update({
@@ -31,30 +37,34 @@ const ValidationRoute = ValidationRouteImport.update({
 
 export interface FileRoutesByFullPath {
   '/': typeof IndexRoute
+  '/paper': typeof PaperRoute
   '/structure': typeof StructureRoute
   '/validation': typeof ValidationRoute
 }
 export interface FileRoutesByTo {
   '/': typeof IndexRoute
+  '/paper': typeof PaperRoute
   '/structure': typeof StructureRoute
   '/validation': typeof ValidationRoute
 }
 export interface FileRoutesById {
   __root__: typeof rootRouteImport
   '/': typeof IndexRoute
+  '/paper': typeof PaperRoute
   '/structure': typeof StructureRoute
   '/validation': typeof ValidationRoute
 }
 export interface FileRouteTypes {
   fileRoutesByFullPath: FileRoutesByFullPath
-  fullPaths: '/' | '/structure' | '/validation'
+  fullPaths: '/' | '/paper' | '/structure' | '/validation'
   fileRoutesByTo: FileRoutesByTo
-  to: '/' | '/structure' | '/validation'
-  id: '__root__' | '/' | '/structure' | '/validation'
+  to: '/' | '/paper' | '/structure' | '/validation'
+  id: '__root__' | '/' | '/paper' | '/structure' | '/validation'
   fileRoutesById: FileRoutesById
 }
 export interface RootRouteChildren {
   IndexRoute: typeof IndexRoute
+  PaperRoute: typeof PaperRoute
   StructureRoute: typeof StructureRoute
   ValidationRoute: typeof ValidationRoute
 }
@@ -66,6 +76,13 @@ declare module '@tanstack/react-router' {
       path: '/'
       fullPath: '/'
       preLoaderRoute: typeof IndexRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/paper': {
+      id: '/paper'
+      path: '/paper'
+      fullPath: '/paper'
+      preLoaderRoute: typeof PaperRouteImport
       parentRoute: typeof rootRouteImport
     }
     '/structure': {
@@ -87,6 +104,7 @@ declare module '@tanstack/react-router' {
 
 const rootRouteChildren: RootRouteChildren = {
   IndexRoute: IndexRoute,
+  PaperRoute: PaperRoute,
   StructureRoute: StructureRoute,
   ValidationRoute: ValidationRoute,
 }

@@ -4,12 +4,22 @@ import {
   LIPID_LIBRARY,
   PLATFORMS,
   RELEASE_TRIGGERS,
-  TARGETING_TABLE,
   TP53_VARIANTS,
   type CargoType,
   type IonizableLipid,
-  type TargetingEntry,
 } from "./data";
+import {
+  PAPER,
+  biodistribution,
+  cargoCompatible,
+  immuneContext,
+  pegRisk,
+  recommendStrategy,
+  releaseFor,
+  sortEscapePenalty,
+  table1Checks,
+  targetingFor,
+} from "./paper";
 
 export interface DesignInput {
   variantId: string;
@@ -25,6 +35,14 @@ export interface DesignInput {
   flowRate: number; // mL/min
   platformId: string;
   triggerId: string;
+  /** Table 2 ligand id, "auto" (paper-recommended for the cancer) or "none" (passive EPR only) */
+  ligandId: string;
+  ligandPct: number; // mol% of lipid surface carrying the targeting ligand
+  /** SORT charged-lipid fraction (mol%) for extrahepatic tropism */
+  sortPct: number;
+  coronaId: string;
+  repeatDosing: boolean;
+  antiPD1: boolean;
 }
 
 export const DEFAULT_INPUT: DesignInput = {
@@ -41,6 +59,12 @@ export const DEFAULT_INPUT: DesignInput = {
   flowRate: 8,
   platformId: "ionizable",
   triggerId: "ph",
+  ligandId: "auto",
+  ligandPct: 1,
+  sortPct: 0,
+  coronaId: "peg",
+  repeatDosing: false,
+  antiPD1: false,
 };
 
 const clamp = (v: number, lo: number, hi: number) => Math.min(hi, Math.max(lo, v));
@@ -62,8 +86,15 @@ export function predictEncapsulation(lipid: IonizableLipid, input: DesignInput):
   const ionTerm = 8 * bell(input.ionizablePct, 49, 12);
   const lipoTerm = 4 * bell(lipid.logP, 4.7, 1.2);
 
-  const raw = 22 + pKaTerm + npTerm + lenTerm + pegTerm + ionTerm + lipoTerm + platform.encapBias;
-  return clamp(raw, 35, 97);
+  const ionizableEncap = (() => {
+    const raw = clamp(22 + pKaTerm + npTerm + lenTerm + pegTerm + ionTerm + lipoTerm, 35, 97);
+    // Table 1: ionizable LNP encapsulation tops out at 95% (typical literature range 85–95%)
+    return raw > 92 ? 92 + (raw - 92) * 0.6 : raw;
+  })();
+  if (platform.id === "ionizable") return ionizableEncap;
+  // other architectures: map the formulation-driven score onto the paper's Table 1 range for that platform
+  const t = clamp((ionizableEncap - 35) / (95 - 35), 0, 1);
+  return platform.encap[0] + t * (platform.encap[1] - platform.encap[0]);
 }
 
 /** Z-average hydrodynamic diameter (nm) from composition + microfluidic conditions. */
@@ -76,7 +107,11 @@ export function predictSize(lipid: IonizableLipid, input: DesignInput): number {
   const chol = 0.32 * (input.cholPct - 38.5);
   const tail = 0.9 * (lipid.tailCarbons - 14);
   const np = -1.4 * (input.npRatio - 6);
-  return clamp(base + peg + flow + rate + chol + tail + np + platform.sizeBias, 42, 210);
+  const surface = 1.2 * input.ligandPct + 0.15 * input.sortPct + (input.coronaId === "bio" ? 10 : 0);
+  const raw = clamp(base + peg + flow + rate + chol + tail + np + surface, 42, 210);
+  if (platform.id === "ionizable") return raw;
+  // other architectures: map onto the paper's Table 1 size range for that platform
+  return platform.size[0] + ((raw - 42) / (210 - 42)) * (platform.size[1] - platform.size[0]);
 }
 
 /** Polydispersity index from process consistency. */
@@ -98,7 +133,8 @@ export function predictEscape(lipid: IonizableLipid, input: DesignInput): number
   const cholTerm = 10 * bell(input.cholPct, 38.5, 9);
   const pegPenalty = -5 * Math.max(0, input.pegPct - 2.5);
   const unsat = lipid.tail.includes(":2") ? 6 : 0;
-  return clamp(14 + pKaTerm + cholTerm + pegPenalty + unsat + helper.phaseBonus + trigger.boost, 8, 96);
+  const sort = sortEscapePenalty(input.sortPct, lipid.pKa, input.pegPct);
+  return clamp(14 + pKaTerm + cholTerm + pegPenalty + unsat + helper.phaseBonus + trigger.boost - sort, 8, 96);
 }
 
 /** Composite in-vitro delivery score. */
@@ -127,16 +163,19 @@ export function rankLipids(input: DesignInput): LipidPrediction[] {
   }).sort((a, b) => b.score - a.score);
 }
 
-export function matchTargeting(cancer: string): TargetingEntry {
-  return TARGETING_TABLE.find((t) => t.cancer === cancer) ?? TARGETING_TABLE[0]!;
-}
-
 export interface DesignResult {
   input: DesignInput;
   ranked: LipidPrediction[];
   lead: LipidPrediction;
   alternates: LipidPrediction[];
-  targeting: TargetingEntry;
+  targeting: ReturnType<typeof targetingFor>;
+  strategy: ReturnType<typeof recommendStrategy>;
+  checks: ReturnType<typeof table1Checks>;
+  compatible: boolean;
+  bio: ReturnType<typeof biodistribution>;
+  peg: ReturnType<typeof pegRisk>;
+  release: ReturnType<typeof releaseFor>;
+  immune: ReturnType<typeof immuneContext>;
   variantNote: string;
   cargoNote: string;
   confidence: number;
@@ -148,21 +187,26 @@ export function runDesign(input: DesignInput, pinnedLipidId?: string): DesignRes
   const alternates = ranked.filter((r) => r.lipid.id !== lead.lipid.id).slice(0, 3);
   const variant = TP53_VARIANTS.find((v) => v.id === input.variantId)!;
   const cargo = CARGOS.find((c) => c.id === input.cargo)!;
-  const total = input.ionizablePct + input.helperPct + input.cholPct + input.pegPct;
+  const total = input.ionizablePct + input.helperPct + input.cholPct + input.pegPct + input.sortPct;
   const confidence = clamp(96 - Math.abs(100 - total) * 1.6 - (lead.pdi > 0.2 ? 8 : 0), 40, 96);
 
-  const strategy =
-    variant.gofRisk > 0.6
-      ? "high gain-of-function risk — co-deliver mutp53 knockdown with wild-type restoration"
-      : "restoration-dominant strategy sufficient; knockdown optional";
+  const strategy = recommendStrategy(variant);
+  const targeting = targetingFor(input.cancer, input.ligandId, input.ligandPct);
 
   return {
     input,
     ranked,
     lead,
     alternates,
-    targeting: matchTargeting(input.cancer),
-    variantNote: `${variant.aa} · ${variant.klass} · ${variant.mechanism}. Recommendation: ${strategy}.`,
+    targeting,
+    strategy,
+    checks: table1Checks(input.platformId, lead.size, lead.encapsulation),
+    compatible: cargoCompatible(input.cargo, input.platformId),
+    bio: biodistribution(input.sortPct, targeting.modelledDose),
+    peg: pegRisk(input.pegPct, input.coronaId, input.repeatDosing),
+    release: releaseFor(input.triggerId, lead.lipid.pKa),
+    immune: immuneContext(input.cargo, input.antiPD1),
+    variantNote: `${variant.aa} · ${variant.klass} · ${variant.mechanism}. Paper strategy: ${CARGOS.find((c) => c.id === strategy.primary)!.label}.`,
     cargoNote: `${cargo.label} · ${cargo.nucleotides} nt · ${cargo.note}`,
     confidence,
   };
@@ -194,7 +238,27 @@ export function buildReport(result: DesignResult) {
       deliveryScore: +lead.score.toFixed(1),
       modelConfidencePct: +result.confidence.toFixed(1),
     },
-    targeting,
+    targeting: {
+      ligand: targeting.ligand ? `${targeting.ligand.strategy} — ${targeting.ligand.ligand}` : "None (passive EPR)",
+      receptor: targeting.ligand?.target ?? "—",
+      cancerMatch: targeting.matchesCancer,
+      ligandMolPct: input.ligandPct,
+      passiveDosePct: targeting.passiveDose,
+      modelledTumourDosePct: +targeting.modelledDose.toFixed(2),
+      status: targeting.ligand?.status ?? "—",
+      limitation: targeting.ligand?.limitation ?? "Passive EPR delivers a median 0.7% of the injected dose (Wilhelm et al. 2016)",
+    },
+    paperStrategy: {
+      recommendedCargo: result.strategy.primary,
+      rationale: result.strategy.rationale,
+      selectedCargoMatches: result.strategy.primary === input.cargo,
+      platformCargoCompatible: result.compatible,
+    },
+    table1: result.checks.map((c) => ({ metric: c.label, value: +c.value.toFixed(1), range: c.range, inRange: c.inRange })),
+    sort: { chargedLipidMolPct: input.sortPct, biodistributionPct: Object.fromEntries(Object.entries(result.bio).map(([k, v]) => [k, +v.toFixed(1)])) },
+    antiPegRisk: { score: +result.peg.score.toFixed(0), level: result.peg.level, corona: input.coronaId, repeatDosing: input.repeatDosing },
+    checkpoint: { antiPD1: input.antiPD1 },
+    reference: `Madison R. ${PAPER.title}. ${PAPER.journal} (2026). doi:${PAPER.doi}`,
     alternates: alternates.map((a) => ({
       name: a.lipid.name,
       pKa: a.lipid.pKa,
