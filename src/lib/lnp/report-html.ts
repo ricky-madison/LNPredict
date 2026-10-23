@@ -63,11 +63,24 @@ ${row("SMILES", f.smiles)}
 
 <h2>Targeting strategy</h2>
 <table>
-${row("Ligand", r.targeting.ligand)}
+${row("Ligand (Table 2)", r.targeting.ligand)}
 ${row("Receptor", r.targeting.receptor)}
-${row("Rationale", r.targeting.rationale)}
-${row("Affinity", r.targeting.affinity)}
-${row("Clinical status", r.targeting.status)}
+${row("Ligand density", r.targeting.ligandMolPct + " mol%")}
+${row("Passive EPR dose (median)", r.targeting.passiveDosePct + "% ID")}
+${row("Modelled tumour dose (illustrative)", r.targeting.modelledTumourDosePct + "% ID")}
+${row("Status", r.targeting.status)}
+${row("Key limitation", r.targeting.limitation)}
+</table>
+
+<h2>Paper-derived assessment</h2>
+<table>
+${row("Paper-recommended cargo", r.paperStrategy.recommendedCargo)}
+${row("Rationale", r.paperStrategy.rationale)}
+${row("Platform / cargo compatible (Table 1)", r.paperStrategy.platformCargoCompatible ? "yes" : "no")}
+${r.table1.map((t) => row("Table 1 · " + t.metric, t.value + " (range " + t.range[0] + "–" + t.range[1] + ") " + (t.inRange ? "in range" : "outside range"))).join("\n")}
+${row("SORT charged lipid", r.sort.chargedLipidMolPct + " mol%")}
+${row("Biodistribution (illustrative, %)", Object.entries(r.sort.biodistributionPct).map(([k, v]) => k + " " + v).join(" · "))}
+${row("Anti-PEG ABC risk", r.antiPegRisk.level + " (" + r.antiPegRisk.score + "/100)")}
 </table>
 
 <h2>Top alternate lipids</h2>
@@ -77,7 +90,7 @@ ${r.alternates
   .join("")}
 </ol>
 
-<p class="foot">${esc(r.disclaimer)}</p>
+<p class="foot">${esc(r.disclaimer)}<br>${esc(r.reference)}</p>
 </body></html>`;
 }
 

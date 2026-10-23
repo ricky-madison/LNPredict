@@ -57,6 +57,8 @@ export interface ValidationRow extends HeldOutRecord {
 function toInput(r: HeldOutRecord): DesignInput {
   return {
     ...DEFAULT_INPUT,
+    ligandPct: 0,
+    sortPct: 0,
     cargo: r.cargo,
     npRatio: r.npRatio,
     ionizablePct: r.ionizablePct,
