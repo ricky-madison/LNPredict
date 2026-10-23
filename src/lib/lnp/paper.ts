@@ -2,14 +2,12 @@ import { CANCERS, LIGANDS, PLATFORMS, type CargoType, type LigandSpec, type Vari
 
 /**
  * Everything in this module is derived from, or explicitly labelled against, the peer-reviewed review:
- * Madison R. "Lipid nanoparticle platforms for p53-targeted cancer therapy". Cancer Nanotechnology (2026).
+ * "Lipid nanoparticle platforms for p53-targeted cancer therapy".
  * https://doi.org/10.1186/s12645-026-00431-9
  * Paper figures 2–4 are themselves conceptual (simulated for visualisation); the curves here follow the same trends.
  */
 export const PAPER = {
   title: "Lipid nanoparticle platforms for p53-targeted cancer therapy",
-  author: "Ricky Madison",
-  journal: "Cancer Nanotechnology",
   doi: "10.1186/s12645-026-00431-9",
   url: "https://doi.org/10.1186/s12645-026-00431-9",
   epr: 0.7, // median % injected dose reaching tumour by passive targeting (Wilhelm et al. 2016)

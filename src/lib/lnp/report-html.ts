@@ -29,7 +29,7 @@ export function reportHtml(result: DesignResult): string {
   ol { margin: 6px 0 0 16px; font: 11.5px ui-monospace, monospace; }
   .foot { margin-top: 26px; font: 10px ui-monospace, monospace; color: #6b7280; border-top: 1px solid #dfe3e8; padding-top: 8px; }
 </style></head><body>
-<h1>p53-LNP Designer — formulation specification</h1>
+<h1>LNPredict — formulation specification</h1>
 <p class="sub">Generated ${esc(r.generated)} · in silico prediction</p>
 
 <h2>Design case</h2>

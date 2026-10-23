@@ -1,4 +1,5 @@
-import { createFileRoute, Link } from "@tanstack/react-router";
+import { createFileRoute } from "@tanstack/react-router";
+import { SiteHeader } from "@/components/lnp/SiteHeader";
 import type { ReactNode } from "react";
 
 import { Card } from "@/components/lnp/controls";
@@ -29,7 +30,7 @@ export const Route = createFileRoute("/paper")({
       {
         name: "description",
         content:
-          "Interactive companion to Madison (2026), Cancer Nanotechnology: LNP architectures, p53 cargo strategies, active targeting, stimuli-responsive release and clinical pipeline, with every table and figure reproduced.",
+          "Interactive companion to the reference paper on p53-targeted LNP platforms: LNP architectures, p53 cargo strategies, active targeting, stimuli-responsive release and clinical pipeline, with every table and figure reproduced.",
       },
       { property: "og:title", content: "Paper Companion — p53-Targeted LNP Platforms" },
       {
@@ -147,37 +148,15 @@ function PaperPage() {
   const rm = (s: ReturnType<typeof releasePH>) => s;
   return (
     <div className="min-h-screen bg-paper text-ink">
-      <header className="flex flex-wrap items-center justify-between gap-3 px-5 py-3 border-b border-line">
-        <div className="flex items-center gap-3">
-          <div className="size-7 grid place-items-center bg-ink text-paper font-mono text-xs font-bold rounded-md">p53</div>
-          <div>
-            <p className="text-[13px] font-semibold tracking-tight leading-none">
-              Paper companion <span className="text-ink-soft/60 font-normal">/ Madison 2026</span>
-            </p>
-            <p className="text-[10px] font-mono uppercase tracking-[0.18em] text-ink-soft/70 mt-1">Cancer Nanotechnology · article in press</p>
-          </div>
-        </div>
-        <div className="flex items-center gap-2">
-          <Link to="/structure" className="font-mono text-[11px] font-medium text-ink-soft ring-1 ring-line rounded-lg py-2 px-3 hover:bg-primary/5 transition-colors">
-            Molecular viewer
-          </Link>
-          <Link to="/validation" className="font-mono text-[11px] font-medium text-ink-soft ring-1 ring-line rounded-lg py-2 px-3 hover:bg-primary/5 transition-colors">
-            Validation
-          </Link>
-          <Link to="/" className="font-mono text-[11px] font-medium text-accent-ink ring-1 ring-primary/40 rounded-lg py-2 px-3 hover:bg-primary/5 transition-colors">
-            ← Designer
-          </Link>
-        </div>
-      </header>
+      <SiteHeader subtitle="Tables 1–3 and Figures 1–4 of the reference paper" />
 
       <main className="px-5 py-6 max-w-[1200px] mx-auto space-y-4">
         <section className="rounded-xl bg-ink text-paper p-6">
-          <p className="font-mono text-[10px] uppercase tracking-[0.18em] text-primary">Review · {PAPER.journal}</p>
+          <p className="font-mono text-[10px] uppercase tracking-[0.18em] text-primary">Reference paper</p>
           <h1 className="mt-2 text-2xl md:text-3xl font-semibold tracking-tight text-balance max-w-[34ch]">{PAPER.title}</h1>
           <p className="mt-2 font-mono text-[12px] text-paper/70">
-            {PAPER.author} ·{" "}
-            <a className="underline decoration-primary underline-offset-2" href={PAPER.url} target="_blank" rel="noreferrer">
-              doi:{PAPER.doi}
+            <a className="underline decoration-primary underline-offset-2" href={PAPER.url} target="_blank" rel="noopener noreferrer">
+              {PAPER.url} ↗
             </a>
           </p>
           <p className="mt-4 text-[13px] leading-relaxed text-paper/80 max-w-[78ch] text-pretty">
@@ -439,8 +418,7 @@ function PaperPage() {
         </div>
 
         <p className="font-mono text-[10px] text-ink-soft/70 text-pretty pb-6">
-          Figures 2–4 in the paper are conceptual plots simulated for visualisation; the curves here reproduce those trends and are not experimental data. Cite as: Madison R. {PAPER.title}.{" "}
-          {PAPER.journal} (2026). doi:{PAPER.doi}.
+          Figures 2–4 in the paper are conceptual plots simulated for visualisation; the curves here reproduce those trends and are not experimental data. Reference: <a className="underline" href={PAPER.url} target="_blank" rel="noopener noreferrer">{PAPER.url} ↗</a>
         </p>
       </main>
     </div>
