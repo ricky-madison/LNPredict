@@ -86,8 +86,15 @@ export function predictEncapsulation(lipid: IonizableLipid, input: DesignInput):
   const ionTerm = 8 * bell(input.ionizablePct, 49, 12);
   const lipoTerm = 4 * bell(lipid.logP, 4.7, 1.2);
 
-  const raw = 22 + pKaTerm + npTerm + lenTerm + pegTerm + ionTerm + lipoTerm + platform.encapBias;
-  return clamp(raw, 35, 97);
+  const ionizableEncap = (() => {
+    const raw = clamp(22 + pKaTerm + npTerm + lenTerm + pegTerm + ionTerm + lipoTerm, 35, 97);
+    // Table 1: ionizable LNP encapsulation tops out at 95% (typical literature range 85–95%)
+    return raw > 92 ? 92 + (raw - 92) * 0.6 : raw;
+  })();
+  if (platform.id === "ionizable") return ionizableEncap;
+  // other architectures: map the formulation-driven score onto the paper's Table 1 range for that platform
+  const t = clamp((ionizableEncap - 35) / (95 - 35), 0, 1);
+  return platform.encap[0] + t * (platform.encap[1] - platform.encap[0]);
 }
 
 /** Z-average hydrodynamic diameter (nm) from composition + microfluidic conditions. */
@@ -101,7 +108,10 @@ export function predictSize(lipid: IonizableLipid, input: DesignInput): number {
   const tail = 0.9 * (lipid.tailCarbons - 14);
   const np = -1.4 * (input.npRatio - 6);
   const surface = 1.2 * input.ligandPct + 0.15 * input.sortPct + (input.coronaId === "bio" ? 10 : 0);
-  return clamp(base + peg + flow + rate + chol + tail + np + platform.sizeBias + surface, 42, 320);
+  const raw = clamp(base + peg + flow + rate + chol + tail + np + surface, 42, 210);
+  if (platform.id === "ionizable") return raw;
+  // other architectures: map onto the paper's Table 1 size range for that platform
+  return platform.size[0] + ((raw - 42) / (210 - 42)) * (platform.size[1] - platform.size[0]);
 }
 
 /** Polydispersity index from process consistency. */

@@ -354,7 +354,7 @@ function PaperPage() {
             <LineChart series={rm(releasePH(6.5))} xMax={48} yMax={100} xLabel="time (h)" yLabel="cumulative release (%)" xTicks={[0, 12, 24, 36, 48]} />
           </Fig>
           <Fig n="3B" title="Three-phase siRNA release" caption="Burst (0–2 h), sustained (2–12 h) and plateau (>12 h) phases from ionizable LNPs.">
-            <LineChart series={releaseSiRNA()} xMax={48} yMax={100} xLabel="time (h)" yLabel="cumulative release (%)" xTicks={[0, 12, 24, 36, 48]} band={{ from: 0, to: 2, label: "burst" }} refX={{ x: 12, label: "plateau >12 h" }} />
+            <LineChart series={releaseSiRNA()} xMax={48} yMax={100} xLabel="time (h)" yLabel="cumulative release (%)" xTicks={[0, 12, 24, 36, 48]} band={{ from: 0, to: 2, label: "" }} refX={{ x: 12, label: "plateau >12 h" }} />
           </Fig>
           <Fig n="3C" title="Thermosensitive release (NLC)" caption="Release at 37–45 °C with a trigger zone at 40–42 °C (DPPC gel-to-liquid-crystalline transition ≈41 °C).">
             <LineChart series={releaseThermo()} xMax={24} yMax={100} xLabel="time (h)" yLabel="cumulative release (%)" xTicks={[0, 6, 12, 18, 24]} />

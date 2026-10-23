@@ -49,7 +49,7 @@ export function LineChart({ series, xLabel, yLabel, xMin = 0, xMax, yMin = 0, yM
         {band ? (
           <g>
             <rect x={px(band.from)} y={M.t} width={px(band.to) - px(band.from)} height={H - M.t - M.b} className="fill-primary/10" />
-            <text x={(px(band.from) + px(band.to)) / 2} y={M.t + 9} textAnchor="middle" className="fill-accent-ink font-mono" fontSize="8">
+            <text x={(px(band.from) + px(band.to)) / 2} y={H - M.b - 5} textAnchor="middle" className="fill-accent-ink font-mono" fontSize="8">
               {band.label}
             </text>
           </g>
@@ -79,7 +79,7 @@ export function LineChart({ series, xLabel, yLabel, xMin = 0, xMax, yMin = 0, yM
         {refX ? (
           <g>
             <line x1={px(refX.x)} x2={px(refX.x)} y1={M.t} y2={H - M.b} className="stroke-rust" strokeDasharray="3 3" strokeWidth="0.9" />
-            <text x={px(refX.x) - 3} y={M.t + 9} textAnchor="end" className="fill-rust font-mono" fontSize="8">
+            <text x={px(refX.x) + (px(refX.x) < (M.l + W - M.r) / 2 ? 3 : -3)} y={M.t + 9} textAnchor={px(refX.x) < (M.l + W - M.r) / 2 ? "start" : "end"} className="fill-rust font-mono" fontSize="8">
               {refX.label}
             </text>
           </g>
