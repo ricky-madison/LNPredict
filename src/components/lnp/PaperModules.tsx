@@ -24,7 +24,7 @@ export function PaperModules({ input, set, result }: { input: DesignInput; set: 
   return (
     <div className="grid grid-cols-12 gap-4">
       {/* STRATEGY */}
-      <div className="col-span-12 xl:col-span-6">
+      <div className="col-span-12 xl:col-span-6 2xl:col-span-4">
         <Card title="p53 strategy · cargo class" tag="06" source="p53 as a master therapeutic target">
           <p className="font-mono text-[11px] text-ink-soft leading-relaxed">
             <span className="text-accent-ink font-bold">{input.variantId}</span> → {result.strategy.rationale}
@@ -76,7 +76,7 @@ export function PaperModules({ input, set, result }: { input: DesignInput; set: 
       </div>
 
       {/* PLATFORM */}
-      <div className="col-span-12 xl:col-span-6">
+      <div className="col-span-12 xl:col-span-6 2xl:col-span-4">
         <Card title="Nanocarrier architecture" tag="07" source="Table 1 · Fig. 1">
           <div className="flex flex-wrap gap-1.5">
             {PLATFORMS.map((p) => (
@@ -117,7 +117,7 @@ export function PaperModules({ input, set, result }: { input: DesignInput; set: 
       </div>
 
       {/* TARGETING */}
-      <div className="col-span-12 xl:col-span-6">
+      <div className="col-span-12 xl:col-span-6 2xl:col-span-4">
         <Card title="Active targeting vs passive EPR" tag="08" source="Table 2 · passive targeting">
           <label className="block">
             <span className="font-mono text-[10px] uppercase tracking-[0.16em] text-ink-soft">Ligand</span>
@@ -171,7 +171,7 @@ export function PaperModules({ input, set, result }: { input: DesignInput; set: 
       </div>
 
       {/* RELEASE */}
-      <div className="col-span-12 xl:col-span-6">
+      <div className="col-span-12 xl:col-span-6 2xl:col-span-4">
         <Card title="Stimuli-responsive release" tag="09" source="Fig. 3 · stimuli-responsive and triggered release">
           <div className="flex flex-wrap gap-1.5">
             {RELEASE_TRIGGERS.map((t) => (
@@ -199,7 +199,7 @@ export function PaperModules({ input, set, result }: { input: DesignInput; set: 
       </div>
 
       {/* SORT */}
-      <div className="col-span-12 xl:col-span-6">
+      <div className="col-span-12 xl:col-span-6 2xl:col-span-4">
         <Card title="SORT charged lipid · biodistribution" tag="10" source="AI-driven LNP design · SORT trade-offs">
           <Slider
             label="SORT charged-lipid fraction"
@@ -234,7 +234,7 @@ export function PaperModules({ input, set, result }: { input: DesignInput; set: 
       </div>
 
       {/* PEG */}
-      <div className="col-span-12 xl:col-span-6">
+      <div className="col-span-12 xl:col-span-6 2xl:col-span-4">
         <Card title="Anti-PEG immunogenicity" tag="11" source="Immunogenicity and safety">
           <div className="flex flex-wrap gap-1.5">
             {CORONAS.map((c) => (
@@ -270,7 +270,7 @@ export function PaperModules({ input, set, result }: { input: DesignInput; set: 
       </div>
 
       {/* IMMUNE + CLINICAL */}
-      <div className="col-span-12 xl:col-span-6">
+      <div className="col-span-12">
         <Card title="Immunotherapy combination & clinical benchmarks" tag="12" source="p53 LNPs in cancer immunotherapy · Table 3">
           <label className="flex items-center gap-2 font-mono text-[11px] text-ink-soft">
             <input type="checkbox" checked={input.antiPD1} onChange={(e) => set("antiPD1", e.target.checked)} />

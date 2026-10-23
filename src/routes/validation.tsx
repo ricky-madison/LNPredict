@@ -50,7 +50,7 @@ function Parity({
   const S = 260;
   const pos = (v: number) => (v / max) * S;
   return (
-    <svg viewBox={`0 0 ${S + 44} ${S + 40}`} className="w-full max-w-[440px]" role="img" aria-label="Parity plot of predicted versus observed values">
+    <svg viewBox={`0 0 ${S + 44} ${S + 40}`} className="w-full max-w-[640px] mx-auto" role="img" aria-label="Parity plot of predicted versus observed values">
       <g transform={`translate(36, 8)`}>
         <rect x={0} y={0} width={S} height={S} fill="var(--panel)" stroke="var(--line)" />
         {[0.25, 0.5, 0.75].map((g) => (
@@ -108,6 +108,11 @@ function Validation() {
   const stats = fitStats(rows.map((r) => pick(r).pred), rows.map((r) => pick(r).obs), meta.tol);
   const points = rows.map((r) => ({ id: r.id, label: `${r.id} ${r.lipidName}`, x: pick(r).obs, y: pick(r).pred }));
 
+  const devs = points
+    .map((p) => ({ id: p.id, label: p.label, signed: p.y - p.x, abs: Math.abs(p.y - p.x) }))
+    .sort((a, b) => b.abs - a.abs);
+  const maxDev = Math.max(...devs.map((d) => d.abs), 1e-9);
+
   const exportCsv = () => {
     const header = "id,reference,lipid,cargo,obs_encap,pred_encap,obs_size,pred_size,obs_pdi,pred_pdi";
     const body = rows
@@ -134,7 +139,7 @@ function Validation() {
         }
       />
 
-      <main className="px-5 py-5">
+      <main className="px-4 py-4 2xl:px-6">
         <h1 className="sr-only">LNPredict model validation against held-out literature formulations</h1>
 
         <div className="flex flex-wrap gap-1.5 mb-4">
@@ -153,7 +158,7 @@ function Validation() {
         </div>
 
         <div className="grid grid-cols-12 gap-4">
-          <div className="col-span-12 lg:col-span-5 rounded-xl bg-panel ring-1 ring-black/5 p-4">
+          <div className="col-span-12 lg:col-span-5 xl:col-span-4 rounded-xl bg-panel ring-1 ring-black/5 p-4">
             <div className="flex items-baseline justify-between mb-3">
               <h2 className="text-[13px] font-semibold tracking-tight">Parity plot — {meta.label}</h2>
               <span className="font-mono text-[10px] text-ink-soft/60">01</span>
@@ -164,12 +169,12 @@ function Validation() {
             </p>
           </div>
 
-          <div className="col-span-12 lg:col-span-7 rounded-xl bg-panel ring-1 ring-black/5 p-4">
+          <div className="col-span-12 lg:col-span-7 xl:col-span-8 rounded-xl bg-panel ring-1 ring-black/5 p-4 flex flex-col">
             <div className="flex items-baseline justify-between mb-3">
               <h2 className="text-[13px] font-semibold tracking-tight">Fit statistics — {meta.label}</h2>
               <span className="font-mono text-[10px] text-ink-soft/60">02</span>
             </div>
-            <div className="grid grid-cols-2 sm:grid-cols-3 gap-2">
+            <div className="grid grid-cols-2 sm:grid-cols-3 xl:grid-cols-6 gap-2">
               <Stat label="MAE" value={`${fmt(stats.mae, meta.decimals)}${meta.unit}`} />
               <Stat label="RMSE" value={`${fmt(stats.rmse, meta.decimals)}${meta.unit}`} />
               <Stat label="R²" value={fmt(stats.r2, 3)} />
@@ -177,6 +182,28 @@ function Validation() {
               <Stat label={`Within ±${meta.tol}${meta.unit}`} value={`${fmt(stats.within * 100, 0)}%`} />
               <Stat label="n" value={String(rows.length)} />
             </div>
+            <h3 className="mt-5 mb-2 font-mono text-[10px] uppercase tracking-[0.16em] text-ink-soft">
+              Residual by formulation · sorted by |error|
+            </h3>
+            <ul className="grid gap-x-8 gap-y-1.5 xl:grid-cols-2 flex-1 content-start">
+              {devs.map((d) => (
+                <li key={d.id} className="grid grid-cols-[2.5rem_minmax(0,1fr)_5.5rem] items-center gap-3 font-mono text-[11px]">
+                  <span className="font-bold">{d.id}</span>
+                  <div className="h-2 rounded-full bg-line overflow-hidden" title={d.label}>
+                    <div
+                      className={d.abs > meta.tol ? "h-full bg-rust" : "h-full bg-primary"}
+                      style={{ width: `${Math.min(100, (d.abs / maxDev) * 100)}%` }}
+                    />
+                  </div>
+                  <span className={`text-right ${d.abs > meta.tol ? "text-rust" : "text-accent-ink"}`}>
+                    {d.signed > 0 ? "+" : ""}
+                    {fmt(d.signed, meta.decimals)}
+                    {meta.unit}
+                  </span>
+                </li>
+              ))}
+            </ul>
+
             <p className="font-mono text-[10px] text-ink-soft mt-3 text-pretty">
               Models are empirical (pKa windows, N/P titration, PEG shielding, microfluidic mixing) rather than fitted
               regressors, so these figures describe agreement with literature, not training accuracy.

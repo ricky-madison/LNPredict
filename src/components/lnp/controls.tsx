@@ -55,7 +55,7 @@ export function Slider({
 
 export function Card({ title, tag, children, source }: { title: string; tag: string; children: ReactNode; source?: string }) {
   return (
-    <section className="rounded-xl bg-panel ring-1 ring-black/5 p-4">
+    <section className="h-full rounded-xl bg-panel ring-1 ring-black/5 p-4">
       <div className="flex items-baseline justify-between mb-3 gap-3">
         <h2 className="text-[13px] font-semibold tracking-tight">{title}</h2>
         <span className="font-mono text-[10px] text-ink-soft/60 shrink-0">{tag}</span>

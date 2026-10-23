@@ -150,21 +150,23 @@ function PaperPage() {
     <div className="min-h-screen bg-paper text-ink">
       <SiteHeader subtitle="Tables 1–3 and Figures 1–4 of the reference paper" />
 
-      <main className="px-5 py-6 max-w-[1200px] mx-auto space-y-4">
-        <section className="rounded-xl bg-ink text-paper p-6">
+      <main className="px-4 py-4 2xl:px-6 space-y-4">
+        <section className="rounded-xl bg-ink text-paper p-6 xl:grid xl:grid-cols-2 xl:gap-10 xl:items-center">
+          <div>
           <p className="font-mono text-[10px] uppercase tracking-[0.18em] text-primary">Reference paper</p>
-          <h1 className="mt-2 text-2xl md:text-3xl font-semibold tracking-tight text-balance max-w-[34ch]">{PAPER.title}</h1>
+          <h1 className="mt-2 text-2xl md:text-3xl font-semibold tracking-tight text-balance max-w-[48ch]">{PAPER.title}</h1>
           <p className="mt-2 font-mono text-[12px] text-paper/70">
             <a className="underline decoration-primary underline-offset-2" href={PAPER.url} target="_blank" rel="noopener noreferrer">
               {PAPER.url} ↗
             </a>
           </p>
-          <p className="mt-4 text-[13px] leading-relaxed text-paper/80 max-w-[78ch] text-pretty">
+          <p className="mt-4 text-[13px] leading-relaxed text-paper/80 text-pretty">
             LNPs are the most clinically validated nanocarrier platform in oncology. This review reframes LNP development around p53 — inactivated in over 50% of
             human cancers — and unifies four nucleic-acid strategies (p53 mRNA, mutant-p53 siRNA, miR-34a mimics, CRISPR-Cas9) under one biological framework,
             with liver-dominant biodistribution, anti-PEG immunogenicity, manufacturing scalability and regulatory complexity as the persistent barriers.
           </p>
-          <ul className="mt-4 grid md:grid-cols-2 gap-x-6 gap-y-1.5 font-mono text-[11px] text-paper/70 list-disc pl-4">
+          </div>
+          <ul className="mt-4 xl:mt-0 grid md:grid-cols-2 gap-x-6 gap-y-2 font-mono text-[11px] text-paper/70 list-disc pl-4">
             <li>Ionizable lipids with optimised pKa (6.0–7.0) enable efficient endosomal escape.</li>
             <li>p53 mRNA-LNPs restore wild-type p53 in TP53-deficient tumours and sensitise to mTOR and checkpoint inhibition.</li>
             <li>KEYNOTE-942 Phase IIb: mRNA-4157 + pembrolizumab, 44% reduction in recurrence risk (neoantigen vaccine, not p53).</li>
@@ -328,7 +330,7 @@ function PaperPage() {
           </Note>
         </Card>
 
-        <div className="grid lg:grid-cols-2 gap-4">
+        <div className="grid lg:grid-cols-2 2xl:grid-cols-4 gap-4">
           <Fig n="3A" title="pH-responsive p53 mRNA release" caption="Accelerated release at pH 5.5 (endosomal) vs pH 6.5 (tumour microenvironment) and pH 7.4 (blood).">
             <LineChart series={rm(releasePH(6.5))} xMax={48} yMax={100} xLabel="time (h)" yLabel="cumulative release (%)" xTicks={[0, 12, 24, 36, 48]} />
           </Fig>

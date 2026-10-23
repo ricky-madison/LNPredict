@@ -165,8 +165,8 @@ export function LipidViewer3D({ smiles, name }: { smiles: string; name: string }
   }, [mol]);
 
   return (
-    <div className="relative">
-      <div ref={host} className="h-[320px] w-full rounded-lg bg-ink overflow-hidden" />
+    <div className="relative h-full min-h-[320px]">
+      <div ref={host} className="absolute inset-0 rounded-lg bg-ink overflow-hidden" />
       {status !== "ready" ? (
         <div className="absolute inset-0 grid place-items-center font-mono text-[11px] text-paper/70 px-6 text-center">
           {status === "loading"
