@@ -20,6 +20,7 @@ export interface LineChartProps {
   yLabel: string;
   xMin?: number;
   xMax: number;
+  yMin?: number;
   yMax: number;
   xLog?: boolean;
   /** shaded vertical band in x units */
@@ -33,14 +34,14 @@ export interface LineChartProps {
 }
 
 /** Dependency-free SVG line chart using theme tokens only. */
-export function LineChart({ series, xLabel, yLabel, xMin = 0, xMax, yMax, xLog, band, refX, refY, xTicks, title }: LineChartProps) {
+export function LineChart({ series, xLabel, yLabel, xMin = 0, xMax, yMin = 0, yMax, xLog, band, refX, refY, xTicks, title }: LineChartProps) {
   const px = (x: number) => {
     const f = xLog ? (Math.log10(x) - Math.log10(xMin)) / (Math.log10(xMax) - Math.log10(xMin)) : (x - xMin) / (xMax - xMin);
     return M.l + f * (W - M.l - M.r);
   };
-  const py = (y: number) => M.t + (1 - y / yMax) * (H - M.t - M.b);
+  const py = (y: number) => M.t + (1 - (y - yMin) / (yMax - yMin)) * (H - M.t - M.b);
   const xt = xTicks ?? (xLog ? [] : niceTicks(xMin, xMax));
-  const yt = niceTicks(0, yMax);
+  const yt = niceTicks(yMin, yMax);
   return (
     <figure className="w-full">
       {title ? <figcaption className="mb-1 font-mono text-[10px] uppercase tracking-[0.14em] text-ink-soft">{title}</figcaption> : null}
@@ -102,7 +103,7 @@ export function LineChart({ series, xLabel, yLabel, xMin = 0, xMax, yMax, xLog, 
             className={TONE[s.tone].stroke}
             points={s.points
               .filter(([x]) => x >= xMin && x <= xMax)
-              .map(([x, y]) => `${px(x).toFixed(1)},${py(Math.min(y, yMax)).toFixed(1)}`)
+              .map(([x, y]) => `${px(x).toFixed(1)},${py(Math.min(Math.max(y, yMin), yMax)).toFixed(1)}`)
               .join(" ")}
           />
         ))}

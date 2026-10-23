@@ -267,12 +267,13 @@ function PaperPage() {
           </Fig>
           <Fig n="2B" title="Zeta potential vs pH" caption="Ionizable LNP with pKa 6.5: charge transition for endosomal escape while remaining near-neutral in circulation (pH 7.4).">
             <LineChart
-              series={zetaVsPH(6.5).map((s) => ({ ...s, points: s.points.map(([x, y]) => [x, y + 10] as [number, number]) }))}
+              series={zetaVsPH(6.5)}
               xMin={4}
               xMax={8}
-              yMax={45}
+              yMin={-10}
+              yMax={30}
               xLabel="pH"
-              yLabel="zeta potential (mV, offset +10)"
+              yLabel="zeta potential (mV)"
               xTicks={[4, 5, 6, 7, 8]}
               band={{ from: 6.0, to: 7.0, label: "pKa window 6.0–7.0" }}
             />
