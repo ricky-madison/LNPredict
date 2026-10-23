@@ -147,6 +147,12 @@ function Validation() {
             ↓ Export CSV
           </button>
           <Link
+            to="/paper"
+            className="font-mono text-[11px] font-medium text-ink-soft ring-1 ring-line rounded-lg py-2 px-3 hover:bg-primary/5 transition-colors"
+          >
+            Paper
+          </Link>
+          <Link
             to="/"
             className="font-mono text-[11px] font-medium text-ink-soft ring-1 ring-line rounded-lg py-2 px-3 hover:bg-primary/5 transition-colors"
           >

@@ -58,6 +58,12 @@ function Structure() {
         </div>
         <div className="flex items-center gap-2">
           <Link
+            to="/paper"
+            className="font-mono text-[11px] font-medium text-ink-soft ring-1 ring-line rounded-lg py-2 px-3 hover:bg-primary/5 transition-colors"
+          >
+            Paper
+          </Link>
+          <Link
             to="/validation"
             className="font-mono text-[11px] font-medium text-ink-soft ring-1 ring-line rounded-lg py-2 px-3 hover:bg-primary/5 transition-colors"
           >
