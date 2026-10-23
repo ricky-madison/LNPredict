@@ -1,4 +1,5 @@
 import { createFileRoute, Link } from "@tanstack/react-router";
+import { SiteHeader } from "@/components/lnp/SiteHeader";
 import { useState } from "react";
 
 import { LipidViewer3D } from "@/components/lnp/LipidViewer3D";
@@ -10,13 +11,13 @@ import { VARIANT_RESIDUE } from "@/lib/lnp/structures";
 export const Route = createFileRoute("/structure")({
   head: () => ({
     meta: [
-      { title: "Molecular Viewer — p53-LNP Designer Lipid & p53 Structures" },
+      { title: "Molecular Viewer — LNPredict Lipid & p53 Structures" },
       {
         name: "description",
         content:
           "Rotate ionizable lipids in 3D from their SMILES, inspect the p53 DNA-binding domain with the hotspot residue highlighted, and read the TP53 mRNA construct map.",
       },
-      { property: "og:title", content: "Molecular Viewer — p53-LNP Designer" },
+      { property: "og:title", content: "Molecular Viewer — LNPredict" },
       {
         property: "og:description",
         content:
@@ -42,41 +43,7 @@ function Structure() {
 
   return (
     <div className="min-h-screen bg-paper text-ink">
-      <header className="flex flex-wrap items-center justify-between gap-3 px-5 py-3 border-b border-line">
-        <div className="flex items-center gap-3">
-          <div className="size-7 grid place-items-center bg-ink text-paper font-mono text-xs font-bold rounded-md">
-            p53
-          </div>
-          <div>
-            <p className="text-[13px] font-semibold tracking-tight leading-none">
-              Molecular viewer <span className="text-ink-soft/60 font-normal">/ lipid · protein · cargo</span>
-            </p>
-            <p className="text-[10px] font-mono uppercase tracking-[0.18em] text-ink-soft/70 mt-1">
-              3D structures · SMILES embedding · PDB 1TUP
-            </p>
-          </div>
-        </div>
-        <div className="flex items-center gap-2">
-          <Link
-            to="/paper"
-            className="font-mono text-[11px] font-medium text-ink-soft ring-1 ring-line rounded-lg py-2 px-3 hover:bg-primary/5 transition-colors"
-          >
-            Paper
-          </Link>
-          <Link
-            to="/validation"
-            className="font-mono text-[11px] font-medium text-ink-soft ring-1 ring-line rounded-lg py-2 px-3 hover:bg-primary/5 transition-colors"
-          >
-            Validation
-          </Link>
-          <Link
-            to="/"
-            className="font-mono text-[11px] font-medium text-ink-soft ring-1 ring-line rounded-lg py-2 px-3 hover:bg-primary/5 transition-colors"
-          >
-            ← Designer
-          </Link>
-        </div>
-      </header>
+      <SiteHeader subtitle="3D structures · SMILES embedding · PDB 1TUP" />
 
       <main className="px-5 py-5">
         <h1 className="sr-only">Molecular viewer for ionizable lipids, p53 structure and the TP53 mRNA cargo</h1>

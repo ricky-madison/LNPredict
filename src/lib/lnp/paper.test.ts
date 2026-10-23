@@ -6,7 +6,7 @@ import { PAPER, cargoCompatible, pegRisk, recommendStrategy, targetingFor } from
 
 const variant = (id: string) => TP53_VARIANTS.find((v) => v.id === id)!;
 
-describe("paper rules (Madison 2026)", () => {
+describe("paper rules", () => {
   it("recommends p53 mRNA for TP53-null", () => {
     expect(recommendStrategy(variant("null")).primary).toBe("mRNA");
   });

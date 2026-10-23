@@ -1,4 +1,5 @@
 import { createFileRoute, Link } from "@tanstack/react-router";
+import { SiteHeader } from "@/components/lnp/SiteHeader";
 import { useMemo, useState } from "react";
 
 import {
@@ -22,13 +23,13 @@ import { PaperModules } from "@/components/lnp/PaperModules";
 export const Route = createFileRoute("/")({
   head: () => ({
     meta: [
-      { title: "p53-LNP Designer — In Silico LNP Formulation Workbench" },
+      { title: "LNPredict — In Silico LNP Formulation Workbench" },
       {
         name: "description",
         content:
           "Interactive companion to the peer-reviewed review on p53-targeted lipid nanoparticles: choose a p53 cargo, nanocarrier, targeting ligand and release trigger, and predict encapsulation, size, PDI and endosomal escape.",
       },
-      { property: "og:title", content: "p53-LNP Designer — LNP Formulation Workbench" },
+      { property: "og:title", content: "LNPredict — LNP Formulation Workbench" },
       {
         property: "og:description",
         content:
@@ -100,59 +101,23 @@ function Designer() {
 
   return (
     <div className="min-h-screen bg-paper text-ink">
-      <header className="flex flex-wrap items-center justify-between gap-3 px-5 py-3 border-b border-line">
-        <div className="flex items-center gap-3">
-          <div className="size-7 grid place-items-center bg-ink text-paper font-mono text-xs font-bold rounded-md">
-            p53
-          </div>
-          <div>
-            <p className="text-[13px] font-semibold tracking-tight leading-none">
-              p53-LNP Designer <span className="text-ink-soft/60 font-normal">/ Formulation Workbench</span>
-            </p>
-            <p className="text-[10px] font-mono uppercase tracking-[0.18em] text-ink-soft/70 mt-1">
-              In silico · empirical + pKa models · build 0x9C2F
-            </p>
-          </div>
-        </div>
-        <div className="flex items-center gap-3">
-          <div className="hidden sm:flex items-center gap-2 font-mono text-[10px] text-ink-soft">
-            <span className="size-1.5 rounded-full bg-primary" />
-            <span className="uppercase tracking-[0.15em]">Model loaded</span>
-            <span className="text-ink-soft/40">·</span>
-            <span>214 formulations · {ranked.length} lipids</span>
-          </div>
-          <button
-            type="button"
-            onClick={exportReport}
-            className="font-mono text-[11px] font-medium text-accent-ink ring-1 ring-primary/40 rounded-lg py-2 px-3 hover:bg-primary/5 transition-colors"
-          >
-            ↓ JSON
-          </button>
-          <button
-            type="button"
-            onClick={() => printReport(result)}
-            className="font-mono text-[11px] font-medium text-accent-ink ring-1 ring-primary/40 rounded-lg py-2 px-3 hover:bg-primary/5 transition-colors"
-          >
-            ↓ PDF spec
-          </button>
-          <Link
-            to="/paper"
-            className="font-mono text-[11px] font-medium text-ink-soft ring-1 ring-line rounded-lg py-2 px-3 hover:bg-primary/5 transition-colors"
-          >
-            Paper →
-          </Link>
-          <Link
-            to="/validation"
-            className="font-mono text-[11px] font-medium text-ink-soft ring-1 ring-line rounded-lg py-2 px-3 hover:bg-primary/5 transition-colors"
-          >
-            Validation →
-          </Link>
-        </div>
-      </header>
+      <SiteHeader
+        subtitle={`In silico · empirical + pKa models · ${ranked.length} lipids`}
+        actions={
+          <>
+            <button type="button" onClick={exportReport} className="font-mono text-[11px] font-medium text-accent-ink ring-1 ring-primary/40 rounded-lg py-2 px-3 hover:bg-primary/5 transition-colors">
+              ↓ JSON
+            </button>
+            <button type="button" onClick={() => printReport(result)} className="font-mono text-[11px] font-medium text-accent-ink ring-1 ring-primary/40 rounded-lg py-2 px-3 hover:bg-primary/5 transition-colors">
+              ↓ PDF spec
+            </button>
+          </>
+        }
+      />
 
 
       <main className="px-5 py-5">
-        <h1 className="sr-only">p53-LNP Designer — in silico lipid nanoparticle formulation platform</h1>
+        <h1 className="sr-only">LNPredict — in silico lipid nanoparticle formulation platform</h1>
         <div className="grid grid-cols-12 gap-4">
           {/* PARAMETER RAIL */}
           <aside className="col-span-12 lg:col-span-4 xl:col-span-3">
@@ -678,10 +643,10 @@ function Designer() {
                   <a
                     href={PAPER.url}
                     target="_blank"
-                    rel="noreferrer"
+                    rel="noopener noreferrer"
                     className="font-mono text-[10px] text-accent-ink hover:underline"
                   >
-                    Madison 2026 · doi:{PAPER.doi} ↗
+                    Reference paper · {PAPER.url} ↗
                   </a>
                 </div>
                 <PaperModules input={input} set={set} result={result} />

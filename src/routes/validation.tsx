@@ -1,4 +1,5 @@
 import { createFileRoute, Link } from "@tanstack/react-router";
+import { SiteHeader } from "@/components/lnp/SiteHeader";
 import { useMemo, useState } from "react";
 
 import { fitStats, validationRows } from "@/lib/lnp/validation";
@@ -6,13 +7,13 @@ import { fitStats, validationRows } from "@/lib/lnp/validation";
 export const Route = createFileRoute("/validation")({
   head: () => ({
     meta: [
-      { title: "Model Validation — p53-LNP Designer Held-Out Benchmark" },
+      { title: "Model Validation — LNPredict Held-Out Benchmark" },
       {
         name: "description",
         content:
           "Predicted vs observed encapsulation, particle size and PDI across 20 held-out published LNP formulations, with MAE, RMSE and R² fit statistics.",
       },
-      { property: "og:title", content: "Model Validation — p53-LNP Designer" },
+      { property: "og:title", content: "Model Validation — LNPredict" },
       {
         property: "og:description",
         content:
@@ -124,45 +125,17 @@ function Validation() {
 
   return (
     <div className="min-h-screen bg-paper text-ink">
-      <header className="flex flex-wrap items-center justify-between gap-3 px-5 py-3 border-b border-line">
-        <div className="flex items-center gap-3">
-          <div className="size-7 grid place-items-center bg-ink text-paper font-mono text-xs font-bold rounded-md">
-            p53
-          </div>
-          <div>
-            <p className="text-[13px] font-semibold tracking-tight leading-none">
-              Model validation <span className="text-ink-soft/60 font-normal">/ held-out benchmark</span>
-            </p>
-            <p className="text-[10px] font-mono uppercase tracking-[0.18em] text-ink-soft/70 mt-1">
-              {rows.length} published formulations · never used to fit the models
-            </p>
-          </div>
-        </div>
-        <div className="flex items-center gap-2">
-          <button
-            type="button"
-            onClick={exportCsv}
-            className="font-mono text-[11px] font-medium text-accent-ink ring-1 ring-primary/40 rounded-lg py-2 px-3 hover:bg-primary/5 transition-colors"
-          >
+      <SiteHeader
+        subtitle={`${rows.length} published formulations · never used to fit the models`}
+        actions={
+          <button type="button" onClick={exportCsv} className="font-mono text-[11px] font-medium text-accent-ink ring-1 ring-primary/40 rounded-lg py-2 px-3 hover:bg-primary/5 transition-colors">
             ↓ Export CSV
           </button>
-          <Link
-            to="/paper"
-            className="font-mono text-[11px] font-medium text-ink-soft ring-1 ring-line rounded-lg py-2 px-3 hover:bg-primary/5 transition-colors"
-          >
-            Paper
-          </Link>
-          <Link
-            to="/"
-            className="font-mono text-[11px] font-medium text-ink-soft ring-1 ring-line rounded-lg py-2 px-3 hover:bg-primary/5 transition-colors"
-          >
-            ← Designer
-          </Link>
-        </div>
-      </header>
+        }
+      />
 
       <main className="px-5 py-5">
-        <h1 className="sr-only">p53-LNP Designer model validation against held-out literature formulations</h1>
+        <h1 className="sr-only">LNPredict model validation against held-out literature formulations</h1>
 
         <div className="flex flex-wrap gap-1.5 mb-4">
           {(Object.keys(METRICS) as Metric[]).map((m) => (

@@ -258,7 +258,7 @@ export function buildReport(result: DesignResult) {
     sort: { chargedLipidMolPct: input.sortPct, biodistributionPct: Object.fromEntries(Object.entries(result.bio).map(([k, v]) => [k, +v.toFixed(1)])) },
     antiPegRisk: { score: +result.peg.score.toFixed(0), level: result.peg.level, corona: input.coronaId, repeatDosing: input.repeatDosing },
     checkpoint: { antiPD1: input.antiPD1 },
-    reference: `Madison R. ${PAPER.title}. ${PAPER.journal} (2026). doi:${PAPER.doi}`,
+    reference: `${PAPER.title}. ${PAPER.url}`,
     alternates: alternates.map((a) => ({
       name: a.lipid.name,
       pKa: a.lipid.pKa,

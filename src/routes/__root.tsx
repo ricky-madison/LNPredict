@@ -78,12 +78,12 @@ export const Route = createRootRouteWithContext<{ queryClient: QueryClient }>()(
     meta: [
       { charSet: "utf-8" },
       { name: "viewport", content: "width=device-width, initial-scale=1" },
-      { title: "p53-LNP Designer" },
+      { title: "LNPredict" },
       {
         name: "description",
         content: "In silico lipid nanoparticle formulation design for TP53-mutant cancers.",
       },
-      { property: "og:title", content: "p53-LNP Designer" },
+      { property: "og:title", content: "LNPredict" },
       {
         property: "og:description",
         content: "In silico lipid nanoparticle formulation design for TP53-mutant cancers.",
